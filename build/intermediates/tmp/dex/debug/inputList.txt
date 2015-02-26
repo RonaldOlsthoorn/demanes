@@ -1,2 +1,0 @@
-/home/ronald/AndroidStudioProjects/mytime/build/intermediates/classes/debug
-/home/ronald/AndroidStudioProjects/mytime/build/intermediates/pre-dexed/debug/android-support-v4-f2bdd2c0b1432ddd257e8f3b7317ebca894385a8.jar
