@@ -11,11 +11,11 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
-//A service that interacts with the BLE device via the Android BLE API.
+/**
+ *  Service used to scan for Bluetooth Low Energy Beacons
+ */
 public class BluetoothLeScanService extends Service {
 
-	public final static String[] RECOGNIZED_BEACONS = { "05094D656D6F03194002020106020A000703041802180318"
-			+ "0000000000000000000000000000000000000000000000000000000000000000000000000000" };
 	public final static String SCAN_RESULT = "ble_scan_result";
 	public final static String SCAN_RESULT_TIMESTAMP = "ble_scan_result_timestamp";
 	public final static String SCAN_RESULT_MAJOR = "ble_scan_result_major";
@@ -24,15 +24,16 @@ public class BluetoothLeScanService extends Service {
 			.getSimpleName();
 	private BluetoothManager mBluetoothManager;
 	private BluetoothAdapter mBluetoothAdapter;
-	// Stops scanning after 5 seconds.
+	// Stops scanning after 1 second.
 	public static final long SCAN_PERIOD = 1 * 1000l;
 	private boolean beaconFound = false;
 	private boolean mScanning;
-	private Handler mHandler;
-	
 	private iBeacon proximity;
 
-	private void broadcastUpload() {
+    /**
+     *  Broadcast intent to update locally. Result of the scan is sent along
+     */
+	private void broadcastLocalUpdate() {
 
 		final Intent intent = new Intent(this, LocalUpdateService.class);
 		intent.putExtra(SCAN_RESULT, beaconFound);
@@ -48,10 +49,11 @@ public class BluetoothLeScanService extends Service {
 	@Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, startId, startId);
-        
-        initialize();
-		scanLeDevice();
 
+        // if initialization succeeds, scan for devices
+        if(initialize()){
+            scanLeDevice();
+        }
         return START_STICKY;
     }
 
@@ -84,7 +86,7 @@ public class BluetoothLeScanService extends Service {
 
 		// Stops scanning after a pre-defined scan period.
 		if(!mScanning){
-			mHandler = new Handler();
+			Handler mHandler = new Handler();
 			mHandler.postDelayed(new Runnable() {
 				@Override
 				public void run() {
@@ -93,7 +95,7 @@ public class BluetoothLeScanService extends Service {
 					mBluetoothAdapter.stopLeScan(mLeScanCallback);
 
 					Log.v(TAG, "closing scan. beacon found:" + beaconFound);
-					broadcastUpload();
+					broadcastLocalUpdate();
 					beaconFound = false;
 					stopSelf();
 				}
@@ -149,21 +151,6 @@ public class BluetoothLeScanService extends Service {
 			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
 		}
 		return new String(hexChars);
-	}
-
-	/**
-	 * 
-	 * @param pdu
-	 * @return true if the pdu is coming from a beacon in the Sense office
-	 */
-	protected boolean parseAd(String pdu) {
-		
-		for (int i = 0; i < RECOGNIZED_BEACONS.length; i++) {
-			if (RECOGNIZED_BEACONS[i].equals(pdu)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	@Override

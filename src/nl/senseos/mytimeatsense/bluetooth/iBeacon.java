@@ -2,10 +2,7 @@ package nl.senseos.mytimeatsense.bluetooth;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.UUID;
-
-import org.apache.http.util.ByteArrayBuffer;
-
+import nl.senseos.mytimeatsense.util.Hex;
 import android.util.Log;
 
 public class iBeacon {
@@ -33,10 +30,10 @@ public class iBeacon {
 		int minor;
 		int tx;
 
-		if (!bytesToHex(Arrays.copyOfRange(PDU, 0, 9)).equals(IBEACON_PREAMBLE)) {
+		if (!Hex.bytesToHex(Arrays.copyOfRange(PDU, 0, 9)).equals(IBEACON_PREAMBLE)) {
 			return null;
 		} else {
-			uuid = bytesToHex(Arrays.copyOfRange(PDU, 9, 25));
+			uuid = Hex.bytesToHex(Arrays.copyOfRange(PDU, 9, 25));
 			major = (int) ByteBuffer.wrap(Arrays.copyOfRange(PDU, 24, 26))
 					.getShort();
 			minor = (int) ByteBuffer.wrap(Arrays.copyOfRange(PDU, 26, 28))
@@ -76,36 +73,39 @@ public class iBeacon {
 		this.tx = tx;
 	}
 
+    /**
+     * @return uuid of beacon instance
+     */
 	public String getUUID() {
 		return uuid;
 	}
 
+    /**
+     * @return major of beacon instance
+     */
 	public int getMajor() {
 		return major;
 	}
 
+    /**
+     * @return minor of beacon instance
+     */
 	public int getMinor() {
 		return minor;
 	}
+
+    /**
+     * @return RSSI of the beacon at detection
+     */
 	public int getRSSI() {
 		return rssi;
 	}
-	
+
+    /**
+     * Update rssi of beacon.
+     * @param r
+     */
 	public void setRSSI(int r){
 		rssi=r;
-	}
-
-	// characters used to display hexadecimal numbers
-	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
-
-	// convert byte array to hexadecimal string
-	public static String bytesToHex(byte[] bytes) {
-		char[] hexChars = new char[bytes.length * 2];
-		for (int j = 0; j < bytes.length; j++) {
-			int v = bytes[j] & 0xFF;
-			hexChars[j * 2] = hexArray[v >>> 4];
-			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-		}
-		return new String(hexChars);
 	}
 }

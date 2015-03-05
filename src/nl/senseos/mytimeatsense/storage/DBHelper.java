@@ -143,12 +143,12 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 	}
 
 	/*
-	 * Inner class representing the table containing all the members
+	 * Inner class representing the table containing all the detections
 	 */
 	public static abstract class DetectionLog implements BaseColumns {
 
 		public static final String TABLE_NAME = "detection_log";
-		public static final String COLUMN_GR_ID = _ID;
+		public static final String COLUMN_ID = _ID;
 		public static final String COLUMN_TIMESTAMP = "timestamp";
 		public static final String COLUMN_DETECTION_RESULT = "detection_result";
 		public static final String COLUMN_MAJOR = "major";
@@ -157,7 +157,7 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 		public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS "
 				+ TABLE_NAME
 				+ " ("
-				+ COLUMN_GR_ID
+				+ COLUMN_ID
 				+ " INTEGER PRIMARY KEY ,"
 				+ COLUMN_TIMESTAMP
 				+ " LONG NOT NULL ,"
@@ -173,7 +173,7 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 				+ TABLE_NAME;
 
 		private static String getIdColumnName() {
-			return COLUMN_GR_ID;
+			return COLUMN_ID;
 		}
 	}
 }

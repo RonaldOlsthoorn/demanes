@@ -3,13 +3,13 @@
     tools:context="com.example.mytimeatsense.PersonalOverviewActivity" >
 
     <item
-        android:id="@+personal_overview/login"
+        android:id="@+id/personal_overview_login"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/login"/>
     
     <item
-        android:id="@+personal_overview/logout"
+        android:id="@+id/personal_overview_logout"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/logout"/>

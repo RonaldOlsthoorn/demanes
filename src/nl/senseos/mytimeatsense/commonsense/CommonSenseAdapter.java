@@ -41,7 +41,7 @@ import android.util.Log;
 
 /**
  * @author Ronald Olsthoorn
- *
+ * Performs all calls to the CommonSense API
  */
 public class CommonSenseAdapter {
 
@@ -49,7 +49,7 @@ public class CommonSenseAdapter {
 	private static SharedPreferences sAuthPrefs;
 	private static SharedPreferences sMainPrefs;
 	private static final long CACHE_REFRESH = 1000l * 60 * 60; // 1 hour
-	private static final String TAG = "Common Sense Adapter";
+	private static final String TAG = CommonSenseAdapter.class.getSimpleName();
 
 	/**
 	 * Key for getting the http response code from the Map object that is
@@ -79,7 +79,6 @@ public class CommonSenseAdapter {
 	/**
 	 * Checks
 	 * 
-	 * @param context
 	 * @return true if the account has a time series sensor. If sensor is
 	 *         present, store the JSONOBject in the sharedpreferences. False
 	 *         otherwise.
@@ -727,12 +726,9 @@ public class CommonSenseAdapter {
 
 	/**
 	 * 
-	 * @param beaconDetected
-	 *            true if a beacon was detected, false otherwise
-	 * @param timestamp
-	 *            timestamp of bluetooth scan
-	 * @return
-	 * @throws JSONException
+	 * @return 0 if upload succeeded, -1 if authentication failed, -2 if
+     * authentication failed
+	 * @throws JSONException thrown if
 	 * @throws IOException
 	 */
 	public int sendBeaconData(JSONObject dataPackage) throws JSONException,

@@ -11,7 +11,7 @@
     tools:context="com.example.mytimeatsense.PersonalOverviewActivity" >
 
     <ProgressBar
-        android:id="@+personal_overview/progress_bar"
+        android:id="@+id/personal_overview_progress_bar"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
         android:visibility="gone" />
  
     <Button
-        android:id="@+personal_overview/to_group"
+        android:id="@+id/personal_overview_to_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -30,10 +30,10 @@
         android:text="@string/to_group_overview" />
 
     <ScrollView
-        android:id="@+personal_overview/content"
+        android:id="@+id/personal_overview_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+personal_overview/to_group"
+        android:layout_above="@+id/personal_overview_to_group"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" >
 
@@ -51,7 +51,7 @@
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <TextView
-                android:id="@+personal_overview/status"
+                android:id="@+id/personal_overview_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
@@ -79,7 +79,7 @@
                     android:gravity="center" >
 
                     <TextView
-                        android:id="@+personal_overview/today_hour"
+                        android:id="@+id/personal_overview_today_hour"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -93,7 +93,7 @@
                         android:textAppearance="?android:attr/textAppearanceLarge" />
 
                     <TextView
-                        android:id="@+personal_overview/today_minute"
+                        android:id="@+id/personal_overview_today_minute"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -107,7 +107,7 @@
                         android:textAppearance="?android:attr/textAppearanceLarge" />
 
                     <TextView
-                        android:id="@+personal_overview/today_seconds"
+                        android:id="@+id/personal_overview_today_seconds"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -177,7 +177,7 @@
                     android:gravity="center" >
 
                     <TextView
-                        android:id="@+personal_overview/this_week_day"
+                        android:id="@+id/personal_overview_this_week_day"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -191,7 +191,7 @@
                         android:textAppearance="?android:attr/textAppearanceLarge" />
 
                     <TextView
-                        android:id="@+personal_overview/this_week_hour"
+                        android:id="@+id/personal_overview_this_week_hour"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -205,7 +205,7 @@
                         android:textAppearance="?android:attr/textAppearanceLarge" />
 
                     <TextView
-                        android:id="@+personal_overview/this_week_minute"
+                        android:id="@+id/personal_overview_this_week_minute"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -219,7 +219,7 @@
                         android:textAppearance="?android:attr/textAppearanceLarge" />
 
                     <TextView
-                        android:id="@+personal_overview/this_week_second"
+                        android:id="@+id/personal_overview_this_week_second"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -302,7 +302,7 @@
                     android:gravity="center" >
 
                     <TextView
-                        android:id="@+personal_overview/this_life_day"
+                        android:id="@+id/personal_overview_this_life_day"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -316,7 +316,7 @@
                         android:textAppearance="?android:attr/textAppearanceLarge" />
 
                     <TextView
-                        android:id="@+personal_overview/this_life_hour"
+                        android:id="@+id/personal_overview_this_life_hour"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -330,7 +330,7 @@
                         android:textAppearance="?android:attr/textAppearanceLarge" />
 
                     <TextView
-                        android:id="@+personal_overview/this_life_minute"
+                        android:id="@+id/personal_overview_this_life_minute"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -344,7 +344,7 @@
                         android:textAppearance="?android:attr/textAppearanceLarge" />
 
                     <TextView
-                        android:id="@+personal_overview/this_life_second"
+                        android:id="@+id/personal_overview_this_life_second"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
