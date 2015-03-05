@@ -10,7 +10,7 @@ import org.json.JSONObject;
 import nl.senseos.mytimeatsense.R;
 import nl.senseos.mytimeatsense.commonsense.CommonSenseAdapter;
 import nl.senseos.mytimeatsense.commonsense.MsgHandler;
-import nl.senseos.mytimeatsense.util.DemanesConstants.GroupPrefs;
+import nl.senseos.mytimeatsense.util.Constants.GroupPrefs;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;

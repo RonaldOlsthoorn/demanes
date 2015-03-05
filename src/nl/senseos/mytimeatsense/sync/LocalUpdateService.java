@@ -1,20 +1,17 @@
 package nl.senseos.mytimeatsense.sync;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import nl.senseos.mytimeatsense.bluetooth.BluetoothLeScanService;
 import nl.senseos.mytimeatsense.gui.activities.PersonalOverviewActivity;
 import nl.senseos.mytimeatsense.storage.DBHelper;
-import nl.senseos.mytimeatsense.util.DemanesConstants.StatusPrefs;
+import nl.senseos.mytimeatsense.util.Constants.StatusPrefs;
 import android.app.IntentService;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.database.Cursor;
 import android.util.Log;
 
 public class LocalUpdateService extends IntentService {
@@ -54,12 +51,12 @@ public class LocalUpdateService extends IntentService {
 		// insert data point in database
 		DB = DBHelper.getDBHelper(this);
 		ContentValues v = new ContentValues();
-		v.put(DBHelper.DetectionLog.COLUMN_TIMESTAMP, scanResultTS);
-		v.put(DBHelper.DetectionLog.COLUMN_DETECTION_RESULT, scanResult);
-		v.put(DBHelper.DetectionLog.COLUMN_MAJOR, scanResultMajor);
-		v.put(DBHelper.DetectionLog.COLUMN_MINOR, scanResultMinor);
+		v.put(DBHelper.DetectionTable.COLUMN_TIMESTAMP, scanResultTS);
+		v.put(DBHelper.DetectionTable.COLUMN_DETECTION_RESULT, scanResult);
+		v.put(DBHelper.DetectionTable.COLUMN_MAJOR, scanResultMajor);
+		v.put(DBHelper.DetectionTable.COLUMN_MINOR, scanResultMinor);
 		
-		DB.insertOrIgnore(DBHelper.DetectionLog.TABLE_NAME, v);
+		DB.insertOrIgnore(DBHelper.DetectionTable.TABLE_NAME, v);
 
 		// update current state in shared preferences
 		statusPrefs = getSharedPreferences(

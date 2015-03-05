@@ -5,9 +5,9 @@ import java.util.GregorianCalendar;
 
 import nl.senseos.mytimeatsense.commonsense.CommonSenseAdapter;
 import nl.senseos.mytimeatsense.commonsense.MsgHandler;
-import nl.senseos.mytimeatsense.util.DemanesConstants.Auth;
+import nl.senseos.mytimeatsense.util.Constants.Auth;
 import nl.senseos.mytimeatsense.storage.DBHelper;
-import nl.senseos.mytimeatsense.util.DemanesConstants.StatusPrefs;
+import nl.senseos.mytimeatsense.util.Constants.StatusPrefs;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -99,7 +99,6 @@ public class GlobalUpdateService extends IntentService {
 				e.printStackTrace();
 			}
 		}
-		
 	}
 
 	private void fullSyncCS() {
@@ -132,7 +131,7 @@ public class GlobalUpdateService extends IntentService {
 			
 			int res = cs.sendBeaconData(dataPackage);
 			if (res == 0) {
-				DB.deleteAllRows(DBHelper.DetectionLog.TABLE_NAME);
+				DB.deleteAllRows(DBHelper.DetectionTable.TABLE_NAME);
 			}
 
 			// fetch latest status and update the status in SharedPreferences

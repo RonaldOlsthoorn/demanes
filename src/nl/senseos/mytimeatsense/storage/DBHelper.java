@@ -44,7 +44,7 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 
 		SQLiteDatabase db;
 		db = getReadableDatabase();
-		return db.query(DetectionLog.TABLE_NAME, null, null, null, null, null,
+		return db.query(DetectionTable.TABLE_NAME, null, null, null, null, null,
 				null);
 	}
 
@@ -62,7 +62,7 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 		return res;
 	}
 
-	public boolean updateOrIgnore(String table, int id, ContentValues values) {
+	public boolean updateOrIgnore(String table, long id, ContentValues values) {
 
 		boolean res = false;
 		Log.d(TAG, "updateOrIgnore on " + table + " values " + values + " "
@@ -81,7 +81,7 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 		return res;
 	}
 
-	public int deleteOrIgnore(String table, int id) {
+	public int deleteOrIgnore(String table, long id) {
 
 		int res = -1;
 		Log.d(TAG, "deleteOrIgnore on " + id);
@@ -121,8 +121,9 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 	 */
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		db.execSQL(DetectionLog.SQL_CREATE_TABLE);
-	}
+		db.execSQL(DetectionTable.SQL_CREATE_TABLE);
+        db.execSQL(BeaconTable.SQL_CREATE_TABLE);
+    }
 
 	/*
 	 * Called when the database is updated. Simply removes all the tables and
@@ -136,8 +137,8 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		db.execSQL(DetectionLog.SQL_DELETE_ENTRIES);
-
+		db.execSQL(DetectionTable.SQL_DELETE_ENTRIES);
+        db.execSQL(BeaconTable.SQL_DELETE_ENTRIES);
 		onCreate(db);
 		DATABASE_VERSION = newVersion;
 	}
@@ -145,14 +146,13 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 	/*
 	 * Inner class representing the table containing all the detections
 	 */
-	public static abstract class DetectionLog implements BaseColumns {
+	public static abstract class DetectionTable implements BaseColumns {
 
-		public static final String TABLE_NAME = "detection_log";
+		public static final String TABLE_NAME = "detections";
 		public static final String COLUMN_ID = _ID;
 		public static final String COLUMN_TIMESTAMP = "timestamp";
 		public static final String COLUMN_DETECTION_RESULT = "detection_result";
-		public static final String COLUMN_MAJOR = "major";
-		public static final String COLUMN_MINOR = "minor";
+		public static final String COLUMN_BEACON = "beacon_id";
 
 		public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS "
 				+ TABLE_NAME
@@ -163,10 +163,8 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 				+ " LONG NOT NULL ,"
 				+ COLUMN_DETECTION_RESULT 
 				+ " BOOLEAN NOT NULL , "
-				+ COLUMN_MAJOR
-				+ " INT ,"
-				+ COLUMN_MINOR
-				+ " INT "			
+				+ COLUMN_BEACON
+				+ " INT "
 				 + " )";
 
 		public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
@@ -176,4 +174,39 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 			return COLUMN_ID;
 		}
 	}
+
+    /*
+  * Inner class representing the table containing all the known beacons
+  */
+    public static abstract class BeaconTable implements BaseColumns {
+
+        public static final String TABLE_NAME = "beacons";
+        public static final String COLUMN_ID = _ID;
+        public static final String COLUMN_UUID = "uuid";
+        public static final String COLUMN_MAJOR = "major";
+        public static final String COLUMN_MINOR = "minor";
+        public static final String COLUMN_REMOTE_ID = "remote_id";
+
+        public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS "
+                + TABLE_NAME
+                + " ("
+                + COLUMN_ID
+                + " INTEGER PRIMARY KEY ,"
+                + COLUMN_UUID
+                + " VARCHAR(32) ,"
+                + COLUMN_MAJOR
+                + " INT , "
+                + COLUMN_MINOR
+                + " INT , "
+                + COLUMN_REMOTE_ID
+                + " INT "
+                + " )";
+
+        public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
+                + TABLE_NAME;
+
+        private static String getIdColumnName() {
+            return COLUMN_ID;
+        }
+    }
 }

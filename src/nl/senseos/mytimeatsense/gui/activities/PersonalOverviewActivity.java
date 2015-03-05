@@ -4,12 +4,12 @@ import nl.senseos.mytimeatsense.R;
 import nl.senseos.mytimeatsense.bluetooth.BleAlarmReceiver;
 import nl.senseos.mytimeatsense.commonsense.MsgHandler;
 import nl.senseos.mytimeatsense.util.Clock;
-import nl.senseos.mytimeatsense.util.DemanesConstants.Auth;
-import nl.senseos.mytimeatsense.util.DemanesConstants.Sensors;
+import nl.senseos.mytimeatsense.util.Constants.Auth;
+import nl.senseos.mytimeatsense.util.Constants.Sensors;
 import nl.senseos.mytimeatsense.storage.DBHelper;
 import nl.senseos.mytimeatsense.sync.GlobalUpdateAlarmReceiver;
 import nl.senseos.mytimeatsense.sync.LocalUpdateService;
-import nl.senseos.mytimeatsense.util.DemanesConstants.StatusPrefs;
+import nl.senseos.mytimeatsense.util.Constants.StatusPrefs;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -318,7 +318,7 @@ public class PersonalOverviewActivity extends Activity {
 					statusEditor.commit();
 
 					DBHelper DB = DBHelper.getDBHelper(PersonalOverviewActivity.this);
-					DB.deleteAllRows(DBHelper.DetectionLog.TABLE_NAME);
+					DB.deleteAllRows(DBHelper.DetectionTable.TABLE_NAME);
 
 					Message m = Message.obtain();
 					logoutHandler.sendMessage(m);
