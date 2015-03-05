@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
-    <string name="title_activity_personal_overview">My time at Sense2</string>
+    <string name="title_activity_personal_overview">My time at Sense</string>
     <string name="status">Status: </string>
     <string name="today">Today: </string>
     <string name="this_week">This week: </string>

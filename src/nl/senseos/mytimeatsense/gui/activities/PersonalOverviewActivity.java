@@ -180,7 +180,6 @@ public class PersonalOverviewActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// User chose not to enable Bluetooth.
 		
-		
 		if (requestCode == REQUEST_ENABLE_BT
 				&& resultCode == Activity.RESULT_CANCELED) {
 			finish();
@@ -274,7 +273,8 @@ public class PersonalOverviewActivity extends Activity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.personal_overview_login) {
+
+		if (id == R.id.personal_overview_switch) {
 			Intent requestCredsIntent = new Intent(this, LoginActivity.class);
 			startActivityForResult(requestCredsIntent, REQUEST_CREDENTIALS);
 			return true;
