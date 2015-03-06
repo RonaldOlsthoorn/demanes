@@ -37,8 +37,8 @@ public class GroupOverviewActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_group_overview);
 
-		scoreList = (ListView) findViewById(R.compare_group.list_members);
-		progressBar = findViewById(R.compare_group.progress_bar);
+		scoreList = (ListView) findViewById(R.id.compare_group_list_members);
+		progressBar = findViewById(R.id.compare_group_progress_bar);
 
 		MsgHandler messageThread = MsgHandler.getInstance();
 		

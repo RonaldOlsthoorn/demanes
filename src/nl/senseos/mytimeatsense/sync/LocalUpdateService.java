@@ -21,8 +21,7 @@ public class LocalUpdateService extends IntentService {
 	private DBHelper DB;
 	private boolean scanResult;
 	private long scanResultTS;
-	private int scanResultMajor;
-	private int scanResultMinor;
+	private long scanResultId;
 	SharedPreferences statusPrefs;
 
 	public LocalUpdateService() {
@@ -41,10 +40,8 @@ public class LocalUpdateService extends IntentService {
 				BluetoothLeScanService.SCAN_RESULT, false);
 		scanResultTS = intent.getLongExtra(
 				BluetoothLeScanService.SCAN_RESULT_TIMESTAMP, 0);
-		scanResultMajor = intent.getIntExtra(
-				BluetoothLeScanService.SCAN_RESULT_MAJOR, -1);
-		scanResultMinor = intent.getIntExtra(
-				BluetoothLeScanService.SCAN_RESULT_MINOR, -1);
+		scanResultId = intent.getIntExtra(
+				BluetoothLeScanService.SCAN_RESULT_ID, -1);
 
 		Log.d(TAG, "detected: " + scanResult + " ts: " + scanResultTS);
 
@@ -53,8 +50,7 @@ public class LocalUpdateService extends IntentService {
 		ContentValues v = new ContentValues();
 		v.put(DBHelper.DetectionTable.COLUMN_TIMESTAMP, scanResultTS);
 		v.put(DBHelper.DetectionTable.COLUMN_DETECTION_RESULT, scanResult);
-		v.put(DBHelper.DetectionTable.COLUMN_MAJOR, scanResultMajor);
-		v.put(DBHelper.DetectionTable.COLUMN_MINOR, scanResultMinor);
+		v.put(DBHelper.DetectionTable.COLUMN_BEACON, scanResultId);
 		
 		DB.insertOrIgnore(DBHelper.DetectionTable.TABLE_NAME, v);
 
@@ -69,7 +65,6 @@ public class LocalUpdateService extends IntentService {
 		prefsEditor.putLong(StatusPrefs.STATUS_TIME_WEEK, getThisWeekTimeUpdate());
 		prefsEditor.putLong(StatusPrefs.STATUS_TIME_TODAY, getTodayTimeUpdate());
 		prefsEditor.commit();
-
 	}
 
 	public long getTotalTimeUpdate() {

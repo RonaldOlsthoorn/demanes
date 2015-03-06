@@ -3,6 +3,12 @@
     tools:context="com.example.mytimeatsense.PersonalOverviewActivity" >
 
     <item
+        android:id="@+id/personal_overview_to_beacons"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/beacon_man"/>
+
+    <item
         android:id="@+id/personal_overview_switch"
         android:orderInCategory="100"
         android:showAsAction="never"

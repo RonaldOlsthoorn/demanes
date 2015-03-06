@@ -9,7 +9,7 @@
     tools:context="nl.senseos.mytimeatsense.gui.activities.GroupOverviewActivity" >
 
     <ProgressBar
-        android:id="@+compare_group/progress_bar"
+        android:id="@+id/compare_group_progress_bar"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -19,7 +19,7 @@
         android:visibility="gone" />
 
     <ListView
-        android:id="@+compare_group/list_members"
+        android:id="@+id/compare_group_list_members"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"

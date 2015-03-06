@@ -18,6 +18,13 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+    <android:uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+    <android:uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -53,8 +60,16 @@
         </service>
 
         <activity
-            android:name="nl.senseos.mytimeatsense.gui.activities.GroupOverviewActivity"
+            android:name=".gui.activities.GroupOverviewActivity"
             android:label="@string/title_activity_group_overview" >
+        </activity>
+        <activity
+            android:name=".gui.activities.BeaconOverviewActivity"
+            android:label="@string/title_activity_beacon_overview" >
+        </activity>
+        <activity
+            android:name=".gui.activities.AddBeaconActivity"
+            android:label="@string/title_activity_add_beacon" >
         </activity>
     </application>
 

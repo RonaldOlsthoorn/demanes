@@ -1,5 +1,6 @@
 package nl.senseos.mytimeatsense.bluetooth;
 
+import nl.senseos.mytimeatsense.storage.DBHelper;
 import nl.senseos.mytimeatsense.sync.LocalUpdateService;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -18,6 +19,7 @@ public class BluetoothLeScanService extends Service {
 
 	public final static String SCAN_RESULT = "ble_scan_result";
 	public final static String SCAN_RESULT_TIMESTAMP = "ble_scan_result_timestamp";
+    public final static String SCAN_RESULT_ID = "ble_scan_result_id";
 	public final static String SCAN_RESULT_MAJOR = "ble_scan_result_major";
 	public final static String SCAN_RESULT_MINOR = "ble_scan_result_minor";
 	private final static String TAG = BluetoothLeScanService.class
@@ -29,6 +31,7 @@ public class BluetoothLeScanService extends Service {
 	private boolean beaconFound = false;
 	private boolean mScanning;
 	private iBeacon proximity;
+    private DBHelper db;
 
     /**
      *  Broadcast intent to update locally. Result of the scan is sent along
@@ -40,6 +43,7 @@ public class BluetoothLeScanService extends Service {
 		intent.putExtra(SCAN_RESULT_TIMESTAMP,
 				System.currentTimeMillis() / 1000); // (in full seconds!)
 		if(beaconFound){
+            intent.putExtra(SCAN_RESULT_ID, proximity.getLocalId());
 			intent.putExtra(SCAN_RESULT_MAJOR, proximity.getMajor());
 			intent.putExtra(SCAN_RESULT_MINOR, proximity.getMinor());			
 		}	
@@ -52,6 +56,7 @@ public class BluetoothLeScanService extends Service {
 
         // if initialization succeeds, scan for devices
         if(initialize()){
+            db = DBHelper.getDBHelper(this);
             scanLeDevice();
         }
         return START_STICKY;
@@ -78,6 +83,7 @@ public class BluetoothLeScanService extends Service {
 			Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
 			return false;
 		}
+
 		return true;
 	}
 
@@ -118,8 +124,8 @@ public class BluetoothLeScanService extends Service {
 				byte[] scanRecord) {
 
 			PDU = scanRecord;		
-			iBeacon res = iBeacon.parseSupportedAd(PDU);
-			
+            iBeacon res = db.getMatchingBeacon(PDU);
+
 			//check if device is a beacon
 			if (res!=null) {
 				Log.v(TAG, "Beacon detected");

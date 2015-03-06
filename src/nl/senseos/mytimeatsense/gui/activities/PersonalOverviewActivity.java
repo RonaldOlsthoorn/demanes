@@ -274,6 +274,11 @@ public class PersonalOverviewActivity extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 
+        if (id == R.id.personal_overview_to_beacons) {
+            Intent intent = new Intent(this, BeaconOverviewActivity.class);
+            startActivity(intent);
+            return true;
+        }
 		if (id == R.id.personal_overview_switch) {
 			Intent requestCredsIntent = new Intent(this, LoginActivity.class);
 			startActivityForResult(requestCredsIntent, REQUEST_CREDENTIALS);
@@ -319,6 +324,7 @@ public class PersonalOverviewActivity extends Activity {
 
 					DBHelper DB = DBHelper.getDBHelper(PersonalOverviewActivity.this);
 					DB.deleteAllRows(DBHelper.DetectionTable.TABLE_NAME);
+                    DB.deleteAllRows(DBHelper.BeaconTable.TABLE_NAME);
 
 					Message m = Message.obtain();
 					logoutHandler.sendMessage(m);

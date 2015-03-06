@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="title_devices">BLE Device Scan</string>
+    <string name="unknown_device">unknown device</string>
+    <string name="menu_scan">scan</string>
+
+</resources>

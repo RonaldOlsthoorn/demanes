@@ -4,6 +4,8 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import nl.senseos.mytimeatsense.storage.DBHelper;
 import nl.senseos.mytimeatsense.util.Hex;
+
+import android.bluetooth.BluetoothDevice;
 import android.content.ContentValues;
 import android.util.Log;
 
@@ -14,7 +16,8 @@ public class iBeacon {
 
     private long localId;
     private long remoteId;
-    private long entityId;
+
+    private BluetoothDevice device;
     private String UUID;
     private int major;
     private int minor;
@@ -56,6 +59,22 @@ public class iBeacon {
         this.major = major;
         this.minor = minor;
         this.tx = tx;
+    }
+
+    public long getLocalId(){
+        return localId;
+    }
+
+    public void setLocalId(long id){
+        localId = id;
+    }
+
+    public BluetoothDevice getDevice(){
+        return device;
+    }
+
+    public void setDevice(BluetoothDevice device) {
+        this.device = device;
     }
 
     /**
@@ -100,6 +119,7 @@ public class iBeacon {
     public int getRSSI() {
         return rssi;
     }
+
 
     /**
      * Update rssi of beacon.

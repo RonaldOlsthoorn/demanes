@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import nl.senseos.mytimeatsense.bluetooth.iBeacon;
+
 /*
  * DBHelper is the applications connection to the database.
  * All the queries are stored as functions of this class.
@@ -47,6 +49,36 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 		return db.query(DetectionTable.TABLE_NAME, null, null, null, null, null,
 				null);
 	}
+
+    public Cursor getAllBeacons(){
+
+        SQLiteDatabase db;
+        db = getReadableDatabase();
+        return db.query(BeaconTable.TABLE_NAME, null, null, null, null, null,
+                null);
+    }
+
+    public iBeacon getMatchingBeacon(byte[] PDU){
+
+        iBeacon res = iBeacon.parseAd(PDU);
+
+        if(res==null){
+            return null;
+        }
+        SQLiteDatabase db= getReadableDatabase();
+        Cursor c = db.query(BeaconTable.TABLE_NAME, null, BeaconTable.COLUMN_UUID+"=? AND "
+                        +BeaconTable.COLUMN_MAJOR+"=? AND "
+                        +BeaconTable.COLUMN_MINOR+"=?",
+                new String[]{res.getUUID(), Integer.toString(res.getMajor()), Integer.toString(res.getMinor())},
+                null, null, null);
+
+        if(c.getCount()==0){
+            return null;
+        }
+        c.moveToFirst();
+        res.setLocalId(c.getLong(0));
+        return res;
+    }
 
 	public long insertOrIgnore(String table, ContentValues values) {
 
@@ -199,7 +231,10 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
                 + COLUMN_MINOR
                 + " INT , "
                 + COLUMN_REMOTE_ID
-                + " INT "
+                + " INT ,"
+                + "UNIQUE("
+                + COLUMN_UUID+","+COLUMN_MAJOR+","+COLUMN_MINOR
+                + ")"
                 + " )";
 
         public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
