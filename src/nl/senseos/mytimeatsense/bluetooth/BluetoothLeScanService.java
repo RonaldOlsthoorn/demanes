@@ -83,7 +83,6 @@ public class BluetoothLeScanService extends Service {
 			Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
 			return false;
 		}
-
 		return true;
 	}
 
@@ -123,23 +122,29 @@ public class BluetoothLeScanService extends Service {
 		public void onLeScan(final BluetoothDevice device, int rssi,
 				byte[] scanRecord) {
 
-			PDU = scanRecord;		
-            iBeacon res = db.getMatchingBeacon(PDU);
+			PDU = scanRecord;
+            iBeacon res = iBeacon.parseAd(device, PDU);
+            if (res==null){
+                return;
+            }
 
-			//check if device is a beacon
-			if (res!=null) {
-				Log.v(TAG, "Beacon detected");
-				beaconFound = true;
-				res.setRSSI(rssi);
+            iBeacon match = db.getMatchingBeacon(res);
+            if (match==null){
+                return;
+            }
+
+			Log.v(TAG, "Beacon detected");
+
+			beaconFound = true;
+			res.setRSSI(rssi);
 				
-				//check whether this device is closer than previous devices.
-				//override proximity if so.
-				if(proximity==null){
-					proximity = res;
-				}else{
-					if(proximity.getRSSI()< rssi){
-						proximity = res;
-					}
+			//check whether this device is closer than previous devices.
+			//override proximity if so.
+			if(proximity==null){
+				proximity = match;
+			}else{
+				if(proximity.getRSSI()< rssi){
+					proximity = match;
 				}
 			}
 		}

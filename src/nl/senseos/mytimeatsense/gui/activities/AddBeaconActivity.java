@@ -22,9 +22,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
-
 import nl.senseos.mytimeatsense.R;
 import nl.senseos.mytimeatsense.bluetooth.iBeacon;
 import nl.senseos.mytimeatsense.storage.DBHelper;
@@ -166,21 +164,17 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
         iBeacon beacon = (iBeacon) parent.getItemAtPosition(position);
-        ContentValues v= new ContentValues();
-        v.put(DBHelper.BeaconTable.COLUMN_UUID, beacon.getUUID());
-        v.put(DBHelper.BeaconTable.COLUMN_MAJOR, beacon.getMajor());
-        v.put(DBHelper.BeaconTable.COLUMN_MINOR, beacon.getMinor());
-
-        long res = db.insertOrIgnore(DBHelper.BeaconTable.TABLE_NAME,v);
+        long res = beacon.insertDB(db);
 
         if(res==-1){
             Toast.makeText(this,"Beacon already saved!", Toast.LENGTH_LONG).show();
 
         }else{
             Toast.makeText(this,"Beacon saved!", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(this, BeaconOverviewActivity.class);
+            setResult(Activity.RESULT_OK);
             finish();
         }
-
     }
 
     // Adapter for holding devices found through scanning.
@@ -199,10 +193,6 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
                 mBeacons.add(beacon);
 
             }
-        }
-
-        public BluetoothDevice getDevice(int position) {
-            return mBeacons.get(position).getDevice();
         }
 
         public void clear() {
@@ -238,13 +228,13 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
                 viewHolder = (ViewHolder) view.getTag();
             }
 
-            BluetoothDevice device = mBeacons.get(i).getDevice();
-            final String deviceName = device.getName();
+            iBeacon beacon = mBeacons.get(i);
+            final String deviceName = beacon.getName();
             if (deviceName != null && deviceName.length() > 0)
                 viewHolder.deviceName.setText(deviceName);
             else
                 viewHolder.deviceName.setText(R.string.unknown_device);
-            viewHolder.deviceAddress.setText(device.getAddress());
+            viewHolder.deviceAddress.setText(beacon.getAdress());
 
             return view;
         }
@@ -257,8 +247,9 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
                 @Override
                 public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
 
-                    final iBeacon res = iBeacon.parseAd(scanRecord);
-                    res.setDevice(device);
+                    final iBeacon res = iBeacon.parseAd(device, scanRecord);
+
+                    Log.e(TAG, "uuid: "+res.getUUID()+" , major: "+res.getMajor()+", minor: "+res.getMinor());
 
                     if(res !=null){
 

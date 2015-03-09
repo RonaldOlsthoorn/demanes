@@ -58,26 +58,24 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
                 null);
     }
 
-    public iBeacon getMatchingBeacon(byte[] PDU){
+    public iBeacon getMatchingBeacon(iBeacon beacon){
 
-        iBeacon res = iBeacon.parseAd(PDU);
-
-        if(res==null){
-            return null;
-        }
         SQLiteDatabase db= getReadableDatabase();
-        Cursor c = db.query(BeaconTable.TABLE_NAME, null, BeaconTable.COLUMN_UUID+"=? AND "
+        Cursor c = db.query(BeaconTable.TABLE_NAME, null,
+                        BeaconTable.COLUMN_UUID+"=? AND "
                         +BeaconTable.COLUMN_MAJOR+"=? AND "
                         +BeaconTable.COLUMN_MINOR+"=?",
-                new String[]{res.getUUID(), Integer.toString(res.getMajor()), Integer.toString(res.getMinor())},
+                new String[]{beacon.getUUID(),
+                        Integer.toString(beacon.getMajor()),
+                        Integer.toString(beacon.getMinor())},
                 null, null, null);
 
         if(c.getCount()==0){
             return null;
         }
         c.moveToFirst();
-        res.setLocalId(c.getLong(0));
-        return res;
+        beacon.setLocalId(c.getLong(0));
+        return beacon;
     }
 
 	public long insertOrIgnore(String table, ContentValues values) {
@@ -214,9 +212,12 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 
         public static final String TABLE_NAME = "beacons";
         public static final String COLUMN_ID = _ID;
+        public static final String COLUMN_MAC = "mac_adress";
+        public static final String COLUMN_NAME = "device_name";
         public static final String COLUMN_UUID = "uuid";
         public static final String COLUMN_MAJOR = "major";
         public static final String COLUMN_MINOR = "minor";
+        public static final String COLUMN_TX = "tx";
         public static final String COLUMN_REMOTE_ID = "remote_id";
 
         public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS "
@@ -224,18 +225,24 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
                 + " ("
                 + COLUMN_ID
                 + " INTEGER PRIMARY KEY ,"
+                + COLUMN_MAC
+                + " TEXT ,"
+                + COLUMN_NAME
+                + " TEXT , "
                 + COLUMN_UUID
                 + " VARCHAR(32) ,"
                 + COLUMN_MAJOR
                 + " INT , "
                 + COLUMN_MINOR
                 + " INT , "
+                + COLUMN_TX
+                + " INT , "
                 + COLUMN_REMOTE_ID
                 + " INT ,"
                 + "UNIQUE("
                 + COLUMN_UUID+","+COLUMN_MAJOR+","+COLUMN_MINOR
-                + ")"
-                + " )";
+                + " ) "
+                + " ) ";
 
         public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
                 + TABLE_NAME;

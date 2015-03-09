@@ -40,7 +40,7 @@ public class LocalUpdateService extends IntentService {
 				BluetoothLeScanService.SCAN_RESULT, false);
 		scanResultTS = intent.getLongExtra(
 				BluetoothLeScanService.SCAN_RESULT_TIMESTAMP, 0);
-		scanResultId = intent.getIntExtra(
+		scanResultId = intent.getLongExtra(
 				BluetoothLeScanService.SCAN_RESULT_ID, -1);
 
 		Log.d(TAG, "detected: " + scanResult + " ts: " + scanResultTS);

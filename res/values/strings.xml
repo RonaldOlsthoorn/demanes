@@ -8,5 +8,7 @@
     <string name="title_activity_add_beacon">AddBeaconActivity</string>
     <string name="menu_stop">stop scanning</string>
     <string name="beacon_man">Beacon management</string>
+    <string name="title_activity_beacon">BeaconActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
