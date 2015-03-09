@@ -10,9 +10,6 @@ import nl.senseos.mytimeatsense.storage.DBHelper;
 import nl.senseos.mytimeatsense.sync.GlobalUpdateAlarmReceiver;
 import nl.senseos.mytimeatsense.sync.LocalUpdateService;
 import nl.senseos.mytimeatsense.util.Constants.StatusPrefs;
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -23,7 +20,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -32,7 +28,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,8 +52,7 @@ public class PersonalOverviewActivity extends Activity {
 	private TextView thisLifeSeconds;
 
 	private TextView status;
-	private View mProgressView;
-	private View mContentView;
+
 	public static final long REPEAT_INTEVAL_MINS_BLE = 5;
 	public static final long REPEAT_INTEVAL_MINS_UPLOAD = 31;
 
@@ -75,7 +69,6 @@ public class PersonalOverviewActivity extends Activity {
 	private PendingIntent BlePendingIntent;
 	
 	private Handler logoutHandler;
-	private View mButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -136,46 +129,32 @@ public class PersonalOverviewActivity extends Activity {
 		statusPrefs = getSharedPreferences(StatusPrefs.PREFS_STATUS,
 				Context.MODE_PRIVATE);
 
-		todayHours = (TextView) findViewById(R.id.personal_overview_today_hour);
-		todayMinutes = (TextView) findViewById(R.id.personal_overview_today_minute);
-		todaySeconds = (TextView) findViewById(R.id.personal_overview_today_seconds);
-
-		thisWeekDays = (TextView) findViewById(R.id.personal_overview_this_week_day);
-		thisWeekHours = (TextView) findViewById(R.id.personal_overview_this_week_hour);
-		thisWeekMinutes = (TextView) findViewById(R.id.personal_overview_this_week_minute);
-		thisWeekSeconds = (TextView) findViewById(R.id.personal_overview_this_week_second);
-
-		thisLifeDays = (TextView) findViewById(R.id.personal_overview_this_life_day);
-		thisLifeHours = (TextView) findViewById(R.id.personal_overview_this_life_hour);
-		thisLifeMinutes = (TextView) findViewById(R.id.personal_overview_this_life_minute);
-		thisLifeSeconds = (TextView) findViewById(R.id.personal_overview_this_life_second);
-
-		status = (TextView) findViewById(R.id.personal_overview_status);
-
-		mProgressView = findViewById(R.id.personal_overview_progress_bar);
-		mContentView = findViewById(R.id.personal_overview_content);
-		mButton = findViewById(R.id.personal_overview_to_group);
-
-		BleServiceIntent = new Intent(this, BleAlarmReceiver.class);
-		BlePendingIntent = PendingIntent.getBroadcast(this, 2,
-				BleServiceIntent, 0);
-
-		alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-				SystemClock.elapsedRealtime() + (1 * 1000),
-				REPEAT_INTEVAL_MINS_BLE * 60 * 1000, BlePendingIntent);
-
-		GlobalUpdateServiceIntent = new Intent(this,
-				GlobalUpdateAlarmReceiver.class);
-		GlobalUpdatePendingIntent = PendingIntent.getBroadcast(this, 2,
-				GlobalUpdateServiceIntent, 0);
-
-		alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-				SystemClock.elapsedRealtime() + (1 * 1000),
-				REPEAT_INTEVAL_MINS_UPLOAD * 60 * 1000,
-				GlobalUpdatePendingIntent);	
+		setTimers();
 
 	}
+
+    public void setTimers(){
+
+        BleServiceIntent = new Intent(this, BleAlarmReceiver.class);
+        BlePendingIntent = PendingIntent.getBroadcast(this, 2,
+                BleServiceIntent, 0);
+
+        alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + (1 * 1000),
+                REPEAT_INTEVAL_MINS_BLE * 60 * 1000, BlePendingIntent);
+
+        GlobalUpdateServiceIntent = new Intent(this,
+                GlobalUpdateAlarmReceiver.class);
+        GlobalUpdatePendingIntent = PendingIntent.getBroadcast(this, 2,
+                GlobalUpdateServiceIntent, 0);
+
+        alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + (1 * 1000),
+                REPEAT_INTEVAL_MINS_UPLOAD * 60 * 1000,
+                GlobalUpdatePendingIntent);
+
+    }
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -192,24 +171,7 @@ public class PersonalOverviewActivity extends Activity {
 			return;
 		}
 
-		BleServiceIntent = new Intent(this, BleAlarmReceiver.class);
-		BlePendingIntent = PendingIntent.getBroadcast(this, 2,
-				BleServiceIntent, 0);
-
-		alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-				SystemClock.elapsedRealtime() + (1 * 1000),
-				REPEAT_INTEVAL_MINS_BLE * 60 * 1000, BlePendingIntent);
-
-		GlobalUpdateServiceIntent = new Intent(this,
-				GlobalUpdateAlarmReceiver.class);
-		GlobalUpdatePendingIntent = PendingIntent.getBroadcast(this, 2,
-				GlobalUpdateServiceIntent, 0);
-
-		alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-				SystemClock.elapsedRealtime() + (1 * 1000),
-				REPEAT_INTEVAL_MINS_UPLOAD * 60 * 1000,
-				GlobalUpdatePendingIntent);
+        setTimers();
 
 		statusPrefs = getSharedPreferences(StatusPrefs.PREFS_STATUS,
 				Context.MODE_PRIVATE);
@@ -222,50 +184,6 @@ public class PersonalOverviewActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.personal_overview, menu);
 		return true;
-	}
-
-	/**
-	 * Shows the progress UI and hides the login form.
-	 */
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-	public void showProgress(final boolean show) {
-		// On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-		// for very easy animations. If available, use these APIs to fade-in
-		// the progress spinner.
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-			int shortAnimTime = getResources().getInteger(
-					android.R.integer.config_shortAnimTime);
-			
-			mButton.setVisibility(show ? View.GONE : View.VISIBLE); 
-
-			mContentView.setVisibility(show ? View.GONE : View.VISIBLE);
-			mContentView.animate().setDuration(shortAnimTime)
-					.alpha(show ? 0 : 1)
-					.setListener(new AnimatorListenerAdapter() {
-						@Override
-						public void onAnimationEnd(Animator animation) {
-							mContentView.setVisibility(show ? View.GONE
-									: View.VISIBLE);
-						}
-					});
-
-			mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-			mProgressView.animate().setDuration(shortAnimTime)
-					.alpha(show ? 1 : 0)
-					.setListener(new AnimatorListenerAdapter() {
-						@Override
-						public void onAnimationEnd(Animator animation) {
-							mProgressView.setVisibility(show ? View.VISIBLE
-									: View.GONE);
-						}
-					});
-		} else {
-			// The ViewPropertyAnimator APIs are not available, so simply show
-			// and hide the relevant UI components.
-			mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-			mContentView.setVisibility(show ? View.GONE : View.VISIBLE);
-			mButton.setVisibility(show ? View.GONE : View.VISIBLE); 
-		}
 	}
 
 	@Override
@@ -342,9 +260,8 @@ public class PersonalOverviewActivity extends Activity {
 		alarmMgr.cancel(BlePendingIntent);
 		alarmMgr.cancel(GlobalUpdatePendingIntent);
 
-		Toast t = Toast.makeText(this, "Logged out successfully",
-				Toast.LENGTH_LONG);
-		t.show();
+		Toast.makeText(this, "Logged out successfully",
+				Toast.LENGTH_LONG).show();
 
 		Intent requestCredsIntent = new Intent(this, LoginActivity.class);
 		startActivityForResult(requestCredsIntent, REQUEST_CREDENTIALS);
@@ -370,10 +287,6 @@ public class PersonalOverviewActivity extends Activity {
 		thisLifeHours = (TextView) findViewById(R.id.personal_overview_this_life_hour);
 		thisLifeMinutes = (TextView) findViewById(R.id.personal_overview_this_life_minute);
 		thisLifeSeconds = (TextView) findViewById(R.id.personal_overview_this_life_second);
-
-		mProgressView = findViewById(R.id.personal_overview_progress_bar);
-		mContentView = findViewById(R.id.personal_overview_content);
-		mButton = findViewById(R.id.personal_overview_to_group);
 		
 		status = (TextView) findViewById(R.id.personal_overview_status);
 
