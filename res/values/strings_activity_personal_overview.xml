@@ -8,7 +8,7 @@
     <string name="this_life">This life: </string>
     <string name="status_present">Status: in the Sense office</string>
     <string name="status_absent">Status: outside the Sense office</string>
-    <string name="to_group_overview">Compare with you colleagues</string>
+    <string name="to_group_overview">Compare with your colleagues</string>
     <string name="error_register_sensor_fail">Unable to register device</string>
       
 </resources>

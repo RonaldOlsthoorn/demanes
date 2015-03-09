@@ -194,8 +194,7 @@ public class PersonalOverviewActivity extends Activity {
 		int id = item.getItemId();
 
         if (id == R.id.personal_overview_to_beacons) {
-            Intent intent = new Intent(this, BeaconOverviewActivity.class);
-            startActivity(intent);
+            toBeacons(null);
             return true;
         }
 		if (id == R.id.personal_overview_switch) {
@@ -320,6 +319,12 @@ public class PersonalOverviewActivity extends Activity {
 		Intent intent = new Intent(this, GroupOverviewActivity.class);
 		startActivity(intent);
 	}
+
+    public void toBeacons(View view){
+        Intent intent = new Intent(this, BeaconOverviewActivity.class);
+        startActivity(intent);
+    }
+
 	private Handler timerHandler = new Handler();
 
 	private Runnable updateTimerThread = new Runnable() {

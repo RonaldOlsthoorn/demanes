@@ -19,21 +19,12 @@
         android:layout_alignParentTop="true"
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
- 
-    <Button
-        android:id="@+id/personal_overview_to_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:onClick="toGroup"
-        android:text="@string/to_group_overview" />
 
     <ScrollView
         android:id="@+id/personal_overview_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/personal_overview_to_group"
+        android:layout_above="@+id/personal_overview_footer"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" >
 
@@ -408,5 +399,31 @@
         </LinearLayout>
 
     </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/personal_overview_footer"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Beacons"
+            android:id="@+id/button3"
+            android:layout_weight="0.5"
+            android:onClick="toBeacons" />
+
+        <Button
+            android:id="@+id/personal_overview_to_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:onClick="toGroup"
+            android:text="@string/to_group_overview"
+            android:layout_weight="0.5" />
+
+    </LinearLayout>
 
 </RelativeLayout>
