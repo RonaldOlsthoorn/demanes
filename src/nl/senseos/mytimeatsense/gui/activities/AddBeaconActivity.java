@@ -25,6 +25,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import nl.senseos.mytimeatsense.R;
 import nl.senseos.mytimeatsense.bluetooth.iBeacon;
+import nl.senseos.mytimeatsense.commonsense.MsgHandler;
 import nl.senseos.mytimeatsense.storage.DBHelper;
 
 public class AddBeaconActivity extends Activity implements OnItemClickListener {
@@ -138,7 +139,6 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
         mLeDeviceListAdapter.clear();
     }
 
-
     private void scanLeDevice(final boolean enable) {
         if (enable) {
             // Stops scanning after a pre-defined scan period.
@@ -170,10 +170,43 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
             Toast.makeText(this,"Beacon already saved!", Toast.LENGTH_LONG).show();
 
         }else{
+
+            MsgHandler handlerThread = MsgHandler.getInstance();
+            Handler handler = new Handler(handlerThread.getLooper());
+            handler.post(new saveRunnable(beacon));
+
             Toast.makeText(this,"Beacon saved!", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(this, BeaconOverviewActivity.class);
             setResult(Activity.RESULT_OK);
             finish();
+        }
+    }
+
+    public class saveRunnable implements Runnable{
+
+        private iBeacon beacon;
+        private int counter=0;
+
+        public saveRunnable(iBeacon beacon){
+            this.beacon=beacon;
+        }
+
+        @Override
+        public void run() {
+
+            if(saveInCS(beacon) || counter>50){
+                return;
+            }else{
+                counter++;
+                Handler handler= new Handler();
+                handler.postDelayed(this, 5*60*1000);
+            }
+        }
+
+        public boolean saveInCS(iBeacon beacon){
+
+            Log.e(TAG, "saving to CS, Remove this log line!!");
+            return false;
         }
     }
 
@@ -248,8 +281,6 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
                 public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
 
                     final iBeacon res = iBeacon.parseAd(device, scanRecord);
-
-                    Log.e(TAG, "uuid: "+res.getUUID()+" , major: "+res.getMajor()+", minor: "+res.getMinor());
 
                     if(res !=null){
 

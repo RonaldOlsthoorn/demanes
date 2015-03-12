@@ -89,6 +89,6 @@
             android:text="forget this beacon"
             android:id="@+id/button2"
             android:layout_marginTop="5dp"
-            android:onClick="toBeacons" />
+            android:onClick="forgetBeacon" />
     </LinearLayout>
 </LinearLayout>

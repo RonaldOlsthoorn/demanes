@@ -43,11 +43,6 @@ import java.util.List;
  */
 public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
-	/**
-	 * Keep track of the login task to ensure we can cancel it if requested.
-	 */
-	private UserLoginTask mAuthTask = null;
-
 	// UI references.
 	private AutoCompleteTextView mEmailView;
 	private EditText mPasswordView;
@@ -125,9 +120,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 	 * errors are presented and no actual login attempt is made.
 	 */
 	public void attemptLogin() {
-		if (mAuthTask != null) {
-			return;
-		}
+
+
 		// Reset errors.
 		mEmailView.setError(null);
 		mPasswordView.setError(null);
@@ -171,8 +165,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 			};
 			
 			mLoginHandler.post(new UserLoginRunnable(email,password));
-//			mAuthTask = new UserLoginTask(email, password);
-//			mAuthTask.execute((Void) null);
 		}
 	}
 
@@ -322,76 +314,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 				return;
 			}
 		}
-		
-	}
-
-	/**
-	 * Represents an asynchronous login/registration task used to authenticate
-	 * the user.
-	 */
-	public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-		private final String mEmail;
-		private final String mPassword;
-
-		UserLoginTask(String email, String password) {
-			mEmail = email;
-			mPassword = password;
-		}
-
-		@Override
-		protected Boolean doInBackground(Void... params) {
-
-			try {
-				// login to commonsense. verfiy credentials only.
-				// email and password are stored in shared preferences.
-				CommonSenseAdapter cs = new CommonSenseAdapter(
-						LoginActivity.this);
-				int res = cs.login(mEmail, mPassword);
-				if (res != 0) {
-					return false;
-				}
-				res = cs.getUserInfo();
-				if (res != 0) {
-					return false;
-				}
-				cs.logout();
-				return true;
-
-			} catch (Exception e) {
-				Log.w(TAG, e);
-				return false;
-			}
-		}
-
-		@Override
-		protected void onPostExecute(final Boolean success) {
-			mAuthTask = null;
-			showProgress(false);
-
-			if (success) {
-
-				Intent intent = new Intent(LoginActivity.this,
-						PersonalOverviewActivity.class);
-
-				if (getParent() == null) {
-					setResult(Activity.RESULT_OK, intent);
-				} else {
-					getParent().setResult(Activity.RESULT_OK, intent);
-				}
-				finish();
-			} else {
-				mPasswordView
-						.setError(getString(R.string.error_incorrect_password));
-				mPasswordView.requestFocus();
-			}
-		}
-
-		@Override
-		protected void onCancelled() {
-			mAuthTask = null;
-			showProgress(false);
-		}
 	}
 	
 	private class PostExecuteRunnable implements Runnable{
@@ -408,10 +330,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 		}
 		
 	}
-	
 
 	protected void onPostExecute(final Boolean success) {
-		mAuthTask = null;
+
 		showProgress(false);
 
 		if (success) {
