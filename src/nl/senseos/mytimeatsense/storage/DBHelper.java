@@ -24,6 +24,8 @@ import nl.senseos.mytimeatsense.bluetooth.iBeacon;
  */
 public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 
+    private static final String MARK_FOR_DELETION="DELETED";
+
 	public static final String TAG = DBHelper.class.getSimpleName();
 	public static int DATABASE_VERSION = 1;
 	public static final String DATABASE_NAME = "Demanes.db";
@@ -54,8 +56,41 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 
         SQLiteDatabase db;
         db = getReadableDatabase();
-        return db.query(BeaconTable.TABLE_NAME, null, null, null, null, null,
+        return db.query(BeaconTable.TABLE_NAME, null,
+                BeaconTable.COLUMN_UUID+" NOT LIKE ?",
+                new String[]{MARK_FOR_DELETION}, null, null, null);
+    }
+
+    public Cursor getUnsavedBeacons(){
+
+        SQLiteDatabase db;
+        db = getReadableDatabase();
+        return db.query(BeaconTable.TABLE_NAME, null,
+                BeaconTable.TABLE_NAME+'.'+BeaconTable.COLUMN_REMOTE_ID+"=-1", null, null, null,
                 null);
+    }
+
+    public void markOrDelete(iBeacon beacon){
+
+        if(beacon.getRemoteId()==-1){
+            deleteOrIgnore(BeaconTable.TABLE_NAME, beacon.getLocalId());
+        }else{
+
+            ContentValues v = new ContentValues();
+            v.put(BeaconTable.COLUMN_UUID,MARK_FOR_DELETION);
+            v.put(BeaconTable.COLUMN_MAJOR,0);
+            v.put(BeaconTable.COLUMN_MINOR,0);
+
+            updateOrIgnore(BeaconTable.TABLE_NAME,beacon.getLocalId(),v);
+        }
+        getMatchingBeacon(beacon);
+    }
+
+    public Cursor getDeletedBeacons(){
+
+        SQLiteDatabase db= getReadableDatabase();
+        return db.query(BeaconTable.TABLE_NAME, null, BeaconTable.COLUMN_UUID+"="+MARK_FOR_DELETION,
+                null,null,null,null);
     }
 
     public iBeacon getMatchingBeacon(iBeacon beacon){
@@ -117,7 +152,7 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 		Log.d(TAG, "deleteOrIgnore on " + id);
 		SQLiteDatabase db = getWritableDatabase();
 		try {
-			res = db.delete(table, _ID + "=?", new String[] { id + "" });
+			res = db.delete(table, _ID + "=?", new String[]{id + ""});
 		} catch (SQLException e) {
 			Log.d(TAG, "deleteOrIgnore on " + id + " fail");
 		}
@@ -239,8 +274,8 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
                 + " INT , "
                 + COLUMN_REMOTE_ID
                 + " INT ,"
-                + "UNIQUE("
-                + COLUMN_UUID+","+COLUMN_MAJOR+","+COLUMN_MINOR
+                + "UNIQUE( "
+                + COLUMN_MAC+","+COLUMN_UUID+","+COLUMN_MAJOR+","+COLUMN_MINOR
                 + " ) "
                 + " ) ";
 

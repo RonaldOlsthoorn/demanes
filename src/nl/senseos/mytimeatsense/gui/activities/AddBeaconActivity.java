@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -27,6 +26,8 @@ import nl.senseos.mytimeatsense.R;
 import nl.senseos.mytimeatsense.bluetooth.iBeacon;
 import nl.senseos.mytimeatsense.commonsense.MsgHandler;
 import nl.senseos.mytimeatsense.storage.DBHelper;
+import nl.senseos.mytimeatsense.sync.BeaconUpdateService;
+import nl.senseos.mytimeatsense.sync.StatusUpdateService;
 
 public class AddBeaconActivity extends Activity implements OnItemClickListener {
 
@@ -170,43 +171,12 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
             Toast.makeText(this,"Beacon already saved!", Toast.LENGTH_LONG).show();
 
         }else{
-
-            MsgHandler handlerThread = MsgHandler.getInstance();
-            Handler handler = new Handler(handlerThread.getLooper());
-            handler.post(new saveRunnable(beacon));
-
+            Intent beaconUpdateIntent = new Intent(this, BeaconUpdateService.class);
+            this.startService(beaconUpdateIntent);
             Toast.makeText(this,"Beacon saved!", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(this, BeaconOverviewActivity.class);
             setResult(Activity.RESULT_OK);
             finish();
-        }
-    }
-
-    public class saveRunnable implements Runnable{
-
-        private iBeacon beacon;
-        private int counter=0;
-
-        public saveRunnable(iBeacon beacon){
-            this.beacon=beacon;
-        }
-
-        @Override
-        public void run() {
-
-            if(saveInCS(beacon) || counter>50){
-                return;
-            }else{
-                counter++;
-                Handler handler= new Handler();
-                handler.postDelayed(this, 5*60*1000);
-            }
-        }
-
-        public boolean saveInCS(iBeacon beacon){
-
-            Log.e(TAG, "saving to CS, Remove this log line!!");
-            return false;
         }
     }
 
@@ -224,7 +194,6 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
         public void addBeacon(iBeacon beacon) {
             if(!mBeacons.contains(beacon)) {
                 mBeacons.add(beacon);
-
             }
         }
 
@@ -267,7 +236,7 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
                 viewHolder.deviceName.setText(deviceName);
             else
                 viewHolder.deviceName.setText(R.string.unknown_device);
-            viewHolder.deviceAddress.setText(beacon.getAdress());
+            viewHolder.deviceAddress.setText(beacon.getAddress());
 
             return view;
         }

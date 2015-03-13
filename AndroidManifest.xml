@@ -56,7 +56,7 @@
         <receiver android:name=".sync.GlobalUpdateAlarmReceiver" >
         </receiver>
 
-        <service android:name=".sync.GlobalUpdateService" >
+        <service android:name=".sync.StatusUpdateService" >
         </service>
 
         <activity
@@ -75,6 +75,12 @@
             android:name=".gui.activities.BeaconActivity"
             android:label="@string/title_activity_beacon" >
         </activity>
+
+        <service
+            android:name=".sync.BeaconUpdateService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>

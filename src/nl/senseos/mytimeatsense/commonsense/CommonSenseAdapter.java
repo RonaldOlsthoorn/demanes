@@ -141,15 +141,15 @@ public class CommonSenseAdapter {
 
         // try to get list of labels from the cache
         try {
-            String cachedSensors = sAuthPrefs.getString(
+            String cachedLabels = sAuthPrefs.getString(
                     Labels.LABEL_LIST_COMPLETE, null);
             long cacheTime = sAuthPrefs.getLong(
                     Labels.LABEL_LIST_COMPLETE_TIME, 0);
             boolean isOutdated = System.currentTimeMillis() - cacheTime > CACHE_REFRESH;
 
             // return cached list of it is still valid
-            if (false == isOutdated && null != cachedSensors) {
-                return new JSONArray(cachedSensors);
+            if (false == isOutdated && null != cachedLabels) {
+                return new JSONArray(cachedLabels);
             }
 
         } catch (Exception e) {
@@ -161,31 +161,32 @@ public class CommonSenseAdapter {
         // if we make it here, the list was not in the cache
         Log.v(TAG, "List of label IDs is missing or outdated, refreshing...");
 
-        boolean done = false;
         JSONArray result = new JSONArray();
         int page = 0;
-        while (!done) {
-            // request fresh list of sensors for this device from CommonSense
-            String cookie = sAuthPrefs.getString(Auth.LOGIN_COOKIE, null);
-            String url = Url.LABELS_URL;
-            Map<String, String> response = request(context, url, METHOD_GET, null, cookie);
 
-            String responseCode = response.get(RESPONSE_CODE);
-            if (!"200".equals(responseCode)) {
-                Log.w(TAG, "Failed to get list of sensors! Response code: "
-                        + responseCode);
-                throw new IOException("Incorrect response from CommonSense: "
-                        + responseCode);
-            }
+        // request fresh list of labels for this user from CommonSense
+        String cookie = sAuthPrefs.getString(Auth.LOGIN_COOKIE, null);
+        String url = Url.LABELS_URL;
 
-            // parse response and store the list
-            JSONObject content = new JSONObject(response.get(RESPONSE_CONTENT));
-            JSONArray labelList = content.getJSONArray("labels");
+        Log.e(TAG, "url: "+url+"   Remove this tag");
 
-            // put the sensor list in the result array
-            for (int i = 0; i < labelList.length(); i++) {
-                result.put(labelList.getJSONObject(i));
-            }
+        Map<String, String> response = request(context, url, METHOD_GET, null, cookie);
+
+        String responseCode = response.get(RESPONSE_CODE);
+        if (!"200".equals(responseCode)) {
+            Log.w(TAG, "Failed to get list of sensors! Response code: "
+                    + responseCode);
+            throw new IOException("Incorrect response from CommonSense: "
+                    + responseCode);
+        }
+
+        // parse response and store the list
+        JSONObject content = new JSONObject(response.get(RESPONSE_CONTENT));
+        JSONArray labelList = content.getJSONArray("labels");
+
+        // put the sensor list in the result array
+        for (int i = 0; i < labelList.length(); i++) {
+            result.put(labelList.getJSONObject(i));
         }
 
         // store the new sensor list
@@ -666,7 +667,7 @@ public class CommonSenseAdapter {
         String code = response.get(RESPONSE_CODE);
         if (!"201".equals(code)) {
             Log.w(TAG,
-                    "Failed to register label at CommonSense! Response code: "
+                    "Failed to register beacon at CommonSense! Response code: "
                             + code);
             throw new IOException("Incorrect response from CommonSense: "
                     + code);
@@ -682,7 +683,7 @@ public class CommonSenseAdapter {
     /**
      * Registers a new iBeacon for this user at CommonSense.
      *
-     * @param beacon
+     * @param remoteId
      *            The name of the sensor.
      * @return The new beacon ID at CommonSense, or <code>null</code> if the
      *         registration failed.
@@ -693,7 +694,7 @@ public class CommonSenseAdapter {
      *             In case of communication failure during creation of the
      *             sensor.
      */
-    public int removeBeacon(iBeacon beacon)
+    public void removeBeacon(int remoteId)
             throws JSONException, IOException {
 
         if (null == sAuthPrefs) {
@@ -704,32 +705,20 @@ public class CommonSenseAdapter {
         String cookie = sAuthPrefs.getString(Auth.LOGIN_COOKIE, null);
 
         // prepare request to create new sensor
-        String url = Url.BEACONS_URL+"/"+beacon.getRemoteId();
-        JSONObject postData = new JSONObject();
-        JSONObject jBeacon = new JSONObject();
-        jBeacon.put("uui", beacon.getUUID());
-        jBeacon.put("major", beacon.getMajor());
-        jBeacon.put("minor", beacon.getMinor());
-        postData.put("beacon", jBeacon);
+        String url = Url.BEACONS_URL+"/"+remoteId;
 
         // perform actual request
         Map<String, String> response = request(context, url, METHOD_DELETE, null, cookie);
 
         // check response code
         String code = response.get(RESPONSE_CODE);
-        if (!"201".equals(code)) {
+        if (!"204".equals(code)) {
             Log.w(TAG,
-                    "Failed to register label at CommonSense! Response code: "
+                    "Failed to delete Beacon at CommonSense! Response code: "
                             + code);
             throw new IOException("Incorrect response from CommonSense: "
                     + code);
         }
-
-        String content = response.get(RESPONSE_CONTENT);
-        jBeacon = new JSONObject(content).getJSONObject("beacon");
-        int id = jBeacon.getInt("id");
-        // return the new beacon ID
-        return id;
     }
 	
 	public boolean isGroupMember(int groupId) throws JSONException, IOException{

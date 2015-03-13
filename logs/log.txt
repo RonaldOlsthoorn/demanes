@@ -1,0 +1,1 @@
+03-13 14:28:08.765: E/CommonSenseAdapter(9075): url: https://ibeaconapi.dev.sense-os.nl/label   Remove this tag

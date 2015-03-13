@@ -85,7 +85,6 @@ public class BeaconOverviewActivity extends Activity implements AdapterView.OnIt
         cursor = db.getAllBeacons();
         beaconAdapter.swapCursor(cursor);
         beaconAdapter.notifyDataSetChanged();
-
     }
 
     public void addBeacon(View view){

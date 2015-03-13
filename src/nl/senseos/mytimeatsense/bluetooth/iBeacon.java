@@ -1,6 +1,5 @@
 package nl.senseos.mytimeatsense.bluetooth;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import nl.senseos.mytimeatsense.storage.DBHelper;
 import nl.senseos.mytimeatsense.util.ByteConverter;
@@ -15,10 +14,10 @@ public class iBeacon {
     private static final String IBEACON_PREAMBLE = "0201061AFF4C000215";
     private static String TAG = iBeacon.class.getSimpleName();
 
-    private long localId;
-    private long remoteId;
+    private long localId=-1;
+    private long remoteId=-1;
 
-    private String adress;
+    private String address;
     private String name;
     private String UUID;
     private int major;
@@ -51,9 +50,22 @@ public class iBeacon {
         return new iBeacon(device.getAddress(), device.getName(), uuid, major, minor, tx);
     }
 
-    public iBeacon(String adress, String name, String uuid, int major, int minor, int tx) {
+    public iBeacon(String address, String name, String uuid, int major, int minor, int tx) {
 
-        this.adress= adress;
+        this.address = address;
+        this.name = name;
+        UUID = uuid;
+        this.major = major;
+        this.minor = minor;
+        this.tx = tx;
+    }
+
+    public iBeacon(int localId, int remoteId, String address, String name,
+                   String uuid, int major, int minor, int tx) {
+
+        this.localId = localId;
+        this.remoteId = remoteId;
+        this.address = address;
         this.name = name;
         UUID = uuid;
         this.major = major;
@@ -121,12 +133,12 @@ public class iBeacon {
         this.name = name;
     }
 
-    public void setAdress(String adress) {
-        this.adress = adress;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public String getAdress() {
-        return adress;
+    public String getAddress() {
+        return address;
     }
 
     /**
@@ -150,7 +162,7 @@ public class iBeacon {
 
         ContentValues beacon = new ContentValues();
         beacon.put(DBHelper.BeaconTable.COLUMN_NAME, name);
-        beacon.put(DBHelper.BeaconTable.COLUMN_MAC, adress);
+        beacon.put(DBHelper.BeaconTable.COLUMN_MAC, address);
         beacon.put(DBHelper.BeaconTable.COLUMN_UUID, UUID);
         beacon.put(DBHelper.BeaconTable.COLUMN_MAJOR, major);
         beacon.put(DBHelper.BeaconTable.COLUMN_MINOR, minor);
@@ -168,7 +180,7 @@ public class iBeacon {
 
         ContentValues beacon = new ContentValues();
         beacon.put(DBHelper.BeaconTable.COLUMN_NAME, name);
-        beacon.put(DBHelper.BeaconTable.COLUMN_MAC, adress);
+        beacon.put(DBHelper.BeaconTable.COLUMN_MAC, address);
         beacon.put(DBHelper.BeaconTable.COLUMN_UUID, UUID);
         beacon.put(DBHelper.BeaconTable.COLUMN_MAJOR, major);
         beacon.put(DBHelper.BeaconTable.COLUMN_MINOR, minor);
@@ -178,8 +190,9 @@ public class iBeacon {
         return (db.updateOrIgnore(DBHelper.BeaconTable.TABLE_NAME, localId, beacon));
     }
 
-    public boolean deleteDB(DBHelper db){
+    public void deleteDB(DBHelper db){
 
-        return db.deleteOrIgnore(DBHelper.BeaconTable.TABLE_NAME, localId)==1;
+        Log.e(TAG, "delete Beacon, remoteId: "+getRemoteId());
+        db.markOrDelete(this);
     }
 }

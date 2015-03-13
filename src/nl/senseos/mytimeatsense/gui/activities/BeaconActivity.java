@@ -12,6 +12,8 @@ import android.widget.Toast;
 import nl.senseos.mytimeatsense.R;
 import nl.senseos.mytimeatsense.bluetooth.iBeacon;
 import nl.senseos.mytimeatsense.storage.DBHelper;
+import nl.senseos.mytimeatsense.sync.BeaconUpdateService;
+import nl.senseos.mytimeatsense.sync.StatusUpdateService;
 
 public class BeaconActivity extends Activity {
 
@@ -36,7 +38,7 @@ public class BeaconActivity extends Activity {
         beacon.setLocalId(intent.getIntExtra(BeaconOverviewActivity.BEACON_ID, -1));
 
         ((TextView) findViewById(R.id.beacon_name)).setText(beacon.getName());
-        ((TextView) findViewById(R.id.beacon_adress)).setText(beacon.getAdress());
+        ((TextView) findViewById(R.id.beacon_adress)).setText(beacon.getAddress());
         ((TextView) findViewById(R.id.beacon_uuid)).setText(beacon.getUUID());
         ((TextView) findViewById(R.id.beacon_major)).setText(Integer.toString(beacon.getMajor()));
         ((TextView) findViewById(R.id.beacon_minor)).setText(Integer.toString(beacon.getMinor()));
@@ -60,7 +62,10 @@ public class BeaconActivity extends Activity {
 
     public void forgetBeacon(View view){
         DBHelper db = DBHelper.getDBHelper(this);
-        boolean res = beacon.deleteDB(db);
+        beacon.deleteDB(db);
+
+        Intent beaconUpdateIntent = new Intent(this, BeaconUpdateService.class);
+        this.startService(beaconUpdateIntent);
 
         Toast.makeText(this, "Beacon deleted", Toast.LENGTH_LONG).show();
         finish();
