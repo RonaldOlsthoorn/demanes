@@ -1,0 +1,21 @@
+03-16 13:27:23.879: E/AndroidRuntime(26443): FATAL EXCEPTION: main
+03-16 13:27:23.879: E/AndroidRuntime(26443): java.lang.NullPointerException
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at android.support.v4.app.FragmentManagerImpl.execPendingActions(FragmentManager.java:1459)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at android.support.v4.app.FragmentActivity.onStart(FragmentActivity.java:571)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at nl.sense_os.brightr.biorhythm.BiorythmMainActivity.onStart(BiorythmMainActivity.java:363)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at nl.sense_os.brightr.biorhythm.BiorythmMainActivity$5.run(BiorythmMainActivity.java:358)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at nl.sense_os.brightr.engine.BrightrBinder.onPostExecute(BrightrBinder.java:32)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at nl.sense_os.brightr.engine.BrightrBinder.onPostExecute(BrightrBinder.java:1)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at android.os.AsyncTask.finish(AsyncTask.java:631)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at android.os.AsyncTask.access$600(AsyncTask.java:177)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at android.os.AsyncTask$InternalHandler.handleMessage(AsyncTask.java:644)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at android.os.Handler.dispatchMessage(Handler.java:99)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at android.os.Looper.loop(Looper.java:213)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at android.app.ActivityThread.main(ActivityThread.java:5225)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at java.lang.reflect.Method.invokeNative(Native Method)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at java.lang.reflect.Method.invoke(Method.java:525)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:786)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:602)
+03-16 13:27:23.879: E/AndroidRuntime(26443): 	at dalvik.system.NativeStart.main(Native Method)
+03-16 13:27:23.889: W/ActivityManager(1005):   Force finishing activity nl.sense_os.brightr/.MainActivity
+03-16 13:27:23.969: D/dalvikvm(1005): GC_FOR_ALLOC freed 2947K, 23% free 40342K/51864K, paused 65ms, total 65ms

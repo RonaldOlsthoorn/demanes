@@ -1267,14 +1267,8 @@ public class CommonSenseAdapter {
 
 			// open new URL connection channel.
 			URL url = new URL(urlString);
-			if ("https".equals(url.getProtocol().toLowerCase(Locale.ENGLISH))) {
-				HttpsURLConnection https = (HttpsURLConnection) url
-						.openConnection();
-				https.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-				urlConnection = https;
-			} else {
-				urlConnection = (HttpURLConnection) url.openConnection();
-			}
+            urlConnection = (HttpURLConnection) url.openConnection();
+            //TODO add https option when live server comes available
 
 			// some parameters
 			urlConnection.setUseCaches(false);

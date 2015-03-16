@@ -21,7 +21,9 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import java.util.ArrayList;
+
 import nl.senseos.mytimeatsense.R;
 import nl.senseos.mytimeatsense.bluetooth.iBeacon;
 import nl.senseos.mytimeatsense.commonsense.MsgHandler;
@@ -136,12 +138,15 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d(TAG, "onPause");
         scanLeDevice(false);
         mLeDeviceListAdapter.clear();
     }
 
     private void scanLeDevice(final boolean enable) {
         if (enable) {
+
+            Log.e(TAG, "scanning enable: " + enable);
             // Stops scanning after a pre-defined scan period.
             mHandler.postDelayed(new Runnable() {
                 @Override
@@ -161,23 +166,34 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
         invalidateOptionsMenu();
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    // Device scan callback.
+    private BluetoothAdapter.LeScanCallback mLeScanCallback =
+            new BluetoothAdapter.LeScanCallback() {
 
-        iBeacon beacon = (iBeacon) parent.getItemAtPosition(position);
-        long res = beacon.insertDB(db);
+                @Override
+                public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
 
-        if(res==-1){
-            Toast.makeText(this,"Beacon already saved!", Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "beacon found");
+                    final iBeacon res = iBeacon.parseAd(device, scanRecord);
 
-        }else{
-            Intent beaconUpdateIntent = new Intent(this, BeaconUpdateService.class);
-            this.startService(beaconUpdateIntent);
-            Toast.makeText(this,"Beacon saved!", Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(this, BeaconOverviewActivity.class);
-            setResult(Activity.RESULT_OK);
-            finish();
-        }
+                    if (res != null) {
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                mLeDeviceListAdapter.addBeacon(res);
+                                mLeDeviceListAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                }
+            };
+
+
+    static class ViewHolder {
+        TextView deviceName;
+        TextView deviceAddress;
     }
 
     // Adapter for holding devices found through scanning.
@@ -192,7 +208,7 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
         }
 
         public void addBeacon(iBeacon beacon) {
-            if(!mBeacons.contains(beacon)) {
+            if (!mBeacons.contains(beacon)) {
                 mBeacons.add(beacon);
             }
         }
@@ -242,31 +258,22 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
         }
     }
 
-    // Device scan callback.
-    private BluetoothAdapter.LeScanCallback mLeScanCallback =
-            new BluetoothAdapter.LeScanCallback() {
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                @Override
-                public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
+        iBeacon beacon = (iBeacon) parent.getItemAtPosition(position);
+        long res = beacon.insertDB(db);
 
-                    final iBeacon res = iBeacon.parseAd(device, scanRecord);
+        if (res == -1) {
+            Toast.makeText(this, "Beacon already saved!", Toast.LENGTH_LONG).show();
 
-                    if(res !=null){
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                mLeDeviceListAdapter.addBeacon(res);
-                                mLeDeviceListAdapter.notifyDataSetChanged();
-                            }
-                        });
-                    }
-                }
-            };
-
-    static class ViewHolder {
-        TextView deviceName;
-        TextView deviceAddress;
+        } else {
+            Intent beaconUpdateIntent = new Intent(this, BeaconUpdateService.class);
+            this.startService(beaconUpdateIntent);
+            Toast.makeText(this, "Beacon saved!", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(this, BeaconOverviewActivity.class);
+            setResult(Activity.RESULT_OK);
+            finish();
+        }
     }
 }
