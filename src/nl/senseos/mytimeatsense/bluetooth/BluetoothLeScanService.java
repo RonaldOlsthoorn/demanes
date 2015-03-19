@@ -27,7 +27,7 @@ public class BluetoothLeScanService extends Service {
 	private BluetoothManager mBluetoothManager;
 	private BluetoothAdapter mBluetoothAdapter;
 	// Stops scanning after 1 second.
-	public static final long SCAN_PERIOD = 1 * 1000l;
+	public static final long SCAN_PERIOD = 5 * 1000l;
 	private boolean beaconFound = false;
 	private boolean mScanning;
 	private iBeacon proximity;
@@ -128,12 +128,11 @@ public class BluetoothLeScanService extends Service {
                 return;
             }
 
+            Log.v(TAG, "info: uuid: "+res.getUUID()+" major: "+res.getMajor()+" minor :"+res.getMinor());
             iBeacon match = db.getMatchingBeacon(res);
             if (match==null){
                 return;
             }
-
-			Log.v(TAG, "Beacon detected");
 
 			beaconFound = true;
 			res.setRSSI(rssi);

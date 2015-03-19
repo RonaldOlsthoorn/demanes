@@ -27,7 +27,6 @@ public class BeaconUpdateService extends IntentService {
 
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
-     *
      */
     public BeaconUpdateService() {
         super(TAG);
@@ -46,7 +45,7 @@ public class BeaconUpdateService extends IntentService {
         updateHandler.post(new GlobalUpdateRunnable());
     }
 
-    private class GlobalUpdateRunnable implements Runnable{
+    private class GlobalUpdateRunnable implements Runnable {
 
         @Override
         public void run() {
@@ -74,7 +73,7 @@ public class BeaconUpdateService extends IntentService {
                 labelPresent = cs.hasLabel(Constants.Labels.LABEL_NAME_OFFICE);
                 // if not present, make one!
                 if (!labelPresent) {
-                    labelPresent = cs.registerLabel(Constants.Labels.LABEL_NAME_OFFICE,"")==0;
+                    labelPresent = cs.registerLabel(Constants.Labels.LABEL_NAME_OFFICE, "") == 0;
                 }
             } catch (IOException | JSONException e1) {
                 e1.printStackTrace();
@@ -92,47 +91,39 @@ public class BeaconUpdateService extends IntentService {
         }
     }
 
-    private void fullSyncBeacons(){
+    private void fullSyncBeacons() {
 
         Cursor addedBeacons = DB.getUnsavedBeacons();
 
-        if(addedBeacons.getCount()>0){
-            addedBeacons.moveToFirst();
+        while (addedBeacons.moveToNext()) {
 
-            while(addedBeacons.getPosition()<addedBeacons.getCount()){
+            iBeacon beacon = new iBeacon(
+                    addedBeacons.getInt(0),
+                    addedBeacons.getInt(7),
+                    addedBeacons.getString(1),
+                    addedBeacons.getString(2),
+                    addedBeacons.getString(3),
+                    addedBeacons.getInt(4),
+                    addedBeacons.getInt(5),
+                    addedBeacons.getInt(6)
+            );
 
-                iBeacon beacon = new iBeacon(addedBeacons.getInt(0),
-                        addedBeacons.getInt(7),
-                        addedBeacons.getString(1),
-                        addedBeacons.getString(2),
-                        addedBeacons.getString(3),
-                        addedBeacons.getInt(4),
-                        addedBeacons.getInt(5),
-                        addedBeacons.getInt(6));
-
-                try {
-                    int remoteId = cs.registerBeacon(beacon);
-                    beacon.setRemoteId(remoteId);
-                    beacon.updateDB(DB);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                addedBeacons.moveToNext();
+            try {
+                int remoteId = cs.registerBeacon(beacon);
+                beacon.setRemoteId(remoteId);
+                beacon.updateDB(DB);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        Cursor removedBeacons = DB.getUnsavedBeacons();
 
-        if(removedBeacons.getCount()>0){
-            removedBeacons.moveToFirst();
+        Cursor removedBeacons = DB.getDeletedBeacons();
 
-            while(removedBeacons.getPosition()<removedBeacons.getCount()){
-
-                try {
-                    cs.removeBeacon(removedBeacons.getInt(7));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                addedBeacons.moveToNext();
+        while (removedBeacons.moveToNext()) {
+            try {
+                cs.removeBeacon(removedBeacons.getInt(7));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

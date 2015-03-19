@@ -42,7 +42,7 @@ public class StatusUpdateService extends IntentService {
 
 	protected void onHandleIntent(Intent intent) {
 
-		Log.v(TAG, "global update");
+		Log.v(TAG, "global update status");
 		
 		DB = DBHelper.getDBHelper(this);
 		
@@ -104,38 +104,11 @@ public class StatusUpdateService extends IntentService {
 
 	private void fullSyncTime() {
 
+        uploadLocalStatus();
+
 		try {
-			// first get the latest update from CS
-			JSONObject response = cs.fetchTotalTime();
-
-			boolean localStatus = statusPrefs.getBoolean(
-					StatusPrefs.STATUS_IN_OFFICE, false);
-
-			long localTs = statusPrefs.getLong(StatusPrefs.STATUS_TIMESTAMP, 0);
-
-			JSONObject dataPackage;
-
-			// no data points present on CS, upload local value as is
-			if (response == null) {
-				dataPackage = dbToJSON(false, 0, 0);
-			} else {
-				// obtain latest update from response
-				long lastUpdateTs = response.getLong("date");
-				JSONObject value = new JSONObject(response.getString("value"));
-				boolean lastUpdateStatus = value.getBoolean("status");
-				long lastUpdateTotalTime = value.getLong("total_time");
-
-				dataPackage = dbToJSON(lastUpdateStatus, lastUpdateTs,
-						lastUpdateTotalTime);
-			}
-			// update and upload to CS
-			int res = cs.sendBeaconData(dataPackage);
-			if (res == 0) {
-				DB.deleteAllRows(DBHelper.DetectionTable.TABLE_NAME);
-			}
-
 			// fetch latest status and update the status in SharedPreferences
-			response = cs.fetchTotalTime();
+            JSONObject response = cs.fetchTotalTime();
 			if (response == null) {
 				return;
 			}
@@ -178,7 +151,41 @@ public class StatusUpdateService extends IntentService {
 		}
 	}
 
-	private void updateStatusPrefs(JSONObject valueCurrent,
+    private void uploadLocalStatus() {
+
+        if(DB.getCompleteLog().getCount()==0){
+            return;
+        }
+
+        try {
+            // first get the latest update from CS
+            JSONObject response = cs.fetchTotalTime();
+
+            JSONObject dataPackage;
+            // no data points present on CS, upload local value as is
+            if (response == null) {
+                dataPackage = dbToJSON(false, 0, 0);
+            } else {
+                // obtain latest update from response
+                long lastUpdateTs = response.getLong("date");
+                JSONObject value = new JSONObject(response.getString("value"));
+                boolean lastUpdateStatus = value.getBoolean("status");
+                long lastUpdateTotalTime = value.getLong("total_time");
+
+                dataPackage = dbToJSON(lastUpdateStatus, lastUpdateTs,
+                        lastUpdateTotalTime);
+            }
+            // update and upload to CS
+            int res = cs.sendBeaconData(dataPackage);
+            if (res == 0) {
+                DB.deleteAllRows(DBHelper.DetectionTable.TABLE_NAME);
+            }
+        }catch (JSONException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateStatusPrefs(JSONObject valueCurrent,
 			JSONObject valueBeforeMidnight, JSONObject valueAfterMidnight,
 			JSONObject valueBeforeMondayMidnight,
 			JSONObject valueAfterMondayMidnight) {

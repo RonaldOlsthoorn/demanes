@@ -166,7 +166,7 @@ public class CommonSenseAdapter {
 
         // request fresh list of labels for this user from CommonSense
         String cookie = sAuthPrefs.getString(Auth.LOGIN_COOKIE, null);
-        String url = Url.LABELS_URL;
+        String url = Url.LABELS_URL+"/all";
 
         Log.e(TAG, "url: "+url+"   Remove this tag");
 
@@ -655,10 +655,13 @@ public class CommonSenseAdapter {
         String url = Url.BEACONS_URL;
         JSONObject postData = new JSONObject();
         JSONObject jBeacon = new JSONObject();
-        jBeacon.put("uui", beacon.getUUID());
+        jBeacon.put("name", beacon.getName());
+        jBeacon.put("uuid", beacon.getUUID());
         jBeacon.put("major", beacon.getMajor());
         jBeacon.put("minor", beacon.getMinor());
         postData.put("beacon", jBeacon);
+
+        Log.e(TAG, postData.toString(4));
 
         // perform actual request
         Map<String, String> response = request(context, url, METHOD_POST, postData, cookie);
@@ -1268,6 +1271,7 @@ public class CommonSenseAdapter {
 			// open new URL connection channel.
 			URL url = new URL(urlString);
             urlConnection = (HttpURLConnection) url.openConnection();
+
             //TODO add https option when live server comes available
 
 			// some parameters

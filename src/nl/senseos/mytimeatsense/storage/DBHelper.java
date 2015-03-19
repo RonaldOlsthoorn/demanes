@@ -89,15 +89,15 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
     public Cursor getDeletedBeacons(){
 
         SQLiteDatabase db= getReadableDatabase();
-        return db.query(BeaconTable.TABLE_NAME, null, BeaconTable.COLUMN_UUID+"="+MARK_FOR_DELETION,
-                null,null,null,null);
+        return db.query(BeaconTable.TABLE_NAME, null, BeaconTable.COLUMN_UUID+" LIKE ?",
+                new String[]{MARK_FOR_DELETION},null,null,null);
     }
 
     public iBeacon getMatchingBeacon(iBeacon beacon){
 
         SQLiteDatabase db= getReadableDatabase();
         Cursor c = db.query(BeaconTable.TABLE_NAME, null,
-                        BeaconTable.COLUMN_UUID+"=? AND "
+                        BeaconTable.COLUMN_UUID+" LIKE ? AND "
                         +BeaconTable.COLUMN_MAJOR+"=? AND "
                         +BeaconTable.COLUMN_MINOR+"=?",
                 new String[]{beacon.getUUID(),

@@ -66,7 +66,7 @@ public class Constants {
 	public static class Url{
 		/** Host name of CommonSense API */
 	    public static final String API_URL = "https://api.sense-os.nl/";
-        public static final String DEV_URL = "https://ibeaconapi.dev.sense-os.nl/";
+        public static final String DEV_URL = "http://ibeaconapi.dev.sense-os.nl/";
 
         public static final String SENSORS_URL = API_URL+"sensors";
 	    public static final String SENSOR_DEVICE_URL = API_URL + "sensors/%1/device";
