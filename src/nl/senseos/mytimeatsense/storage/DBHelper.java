@@ -24,8 +24,6 @@ import nl.senseos.mytimeatsense.bluetooth.iBeacon;
  */
 public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 
-    private static final String MARK_FOR_DELETION="DELETED";
-
 	public static final String TAG = DBHelper.class.getSimpleName();
 	public static int DATABASE_VERSION = 1;
 	public static final String DATABASE_NAME = "Demanes.db";
@@ -52,13 +50,20 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 				null);
 	}
 
-    public Cursor getAllBeacons(){
+    public Cursor getAllVisibleBeacons(){
 
         SQLiteDatabase db;
         db = getReadableDatabase();
         return db.query(BeaconTable.TABLE_NAME, null,
-                BeaconTable.COLUMN_UUID+" NOT LIKE ?",
-                new String[]{MARK_FOR_DELETION}, null, null, null);
+                BeaconTable.COLUMN_STATE+" LIKE ?",
+                new String[]{BeaconTable.STATE_ACTIVE}, null, null, null);
+    }
+
+    public Cursor getAllBeacons(){
+
+        SQLiteDatabase db;
+        db = getReadableDatabase();
+        return db.query(BeaconTable.TABLE_NAME, null, null, null, null, null, null);
     }
 
     public Cursor getUnsavedBeacons(){
@@ -66,21 +71,31 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
         SQLiteDatabase db;
         db = getReadableDatabase();
         return db.query(BeaconTable.TABLE_NAME, null,
-                BeaconTable.TABLE_NAME+'.'+BeaconTable.COLUMN_REMOTE_ID+"=-1", null, null, null,
-                null);
+                BeaconTable.TABLE_NAME+'.'+BeaconTable.COLUMN_REMOTE_ID+"= -1",
+                null, null, null, null);
     }
 
     public void markOrDelete(iBeacon beacon){
 
-        if(beacon.getRemoteId()==-1){
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor c = db.query(BeaconTable.TABLE_NAME, null,
+                BeaconTable.COLUMN_ID+"=?",new String[]{String.valueOf(beacon.getLocalId())},
+                null, null, null);
+
+        if(c.getCount()==0){
+            return;
+        }
+
+        // If no remote is set for this beacon (beacon has no mirror on beacon server),
+        // just delete it
+        c.moveToFirst();
+
+        if(c.getInt(7)==-1){
             deleteOrIgnore(BeaconTable.TABLE_NAME, beacon.getLocalId());
         }else{
-
+            //otherwise mark for deletion
             ContentValues v = new ContentValues();
-            v.put(BeaconTable.COLUMN_UUID,MARK_FOR_DELETION);
-            v.put(BeaconTable.COLUMN_MAJOR,0);
-            v.put(BeaconTable.COLUMN_MINOR,0);
-
+            v.put(BeaconTable.COLUMN_STATE, BeaconTable.STATE_INACTIVE);
             updateOrIgnore(BeaconTable.TABLE_NAME,beacon.getLocalId(),v);
         }
         getMatchingBeacon(beacon);
@@ -89,8 +104,8 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
     public Cursor getDeletedBeacons(){
 
         SQLiteDatabase db= getReadableDatabase();
-        return db.query(BeaconTable.TABLE_NAME, null, BeaconTable.COLUMN_UUID+" LIKE ?",
-                new String[]{MARK_FOR_DELETION},null,null,null);
+        return db.query(BeaconTable.TABLE_NAME, null, BeaconTable.COLUMN_STATE+" LIKE ? ",
+                new String[]{BeaconTable.STATE_INACTIVE},null,null,null);
     }
 
     public iBeacon getMatchingBeacon(iBeacon beacon){
@@ -142,7 +157,6 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 					+ id + " fail");
 			res = false;
 		}
-		//db.close();
 		return res;
 	}
 
@@ -156,7 +170,6 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 		} catch (SQLException e) {
 			Log.d(TAG, "deleteOrIgnore on " + id + " fail");
 		}
-		db.close();
 		return res;
 	}
 	
@@ -170,7 +183,6 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 		} catch (SQLException e) {
 			Log.d(TAG, "deleteAllRows on " + table + " fail");
 		}
-		db.close();
 		return res;
 	}
 
@@ -247,21 +259,23 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 
         public static final String TABLE_NAME = "beacons";
         public static final String COLUMN_ID = _ID;
-        public static final String COLUMN_MAC = "mac_adress";
         public static final String COLUMN_NAME = "device_name";
         public static final String COLUMN_UUID = "uuid";
         public static final String COLUMN_MAJOR = "major";
         public static final String COLUMN_MINOR = "minor";
         public static final String COLUMN_TX = "tx";
         public static final String COLUMN_REMOTE_ID = "remote_id";
+        public static final String COLUMN_STATE = "state";
+
+        public static final String STATE_ACTIVE="active";
+        public static final String STATE_INACTIVE="inactive";
+
 
         public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS "
                 + TABLE_NAME
                 + " ("
                 + COLUMN_ID
                 + " INTEGER PRIMARY KEY ,"
-                + COLUMN_MAC
-                + " TEXT ,"
                 + COLUMN_NAME
                 + " TEXT , "
                 + COLUMN_UUID
@@ -274,8 +288,10 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
                 + " INT , "
                 + COLUMN_REMOTE_ID
                 + " INT ,"
+                + COLUMN_STATE
+                + " TEXT , "
                 + "UNIQUE( "
-                + COLUMN_MAC+","+COLUMN_UUID+","+COLUMN_MAJOR+","+COLUMN_MINOR
+                + COLUMN_UUID+","+COLUMN_MAJOR+","+COLUMN_MINOR+","+COLUMN_STATE
                 + " ) "
                 + " ) ";
 

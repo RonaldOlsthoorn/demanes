@@ -16,8 +16,5 @@ public class GlobalUpdateAlarmReceiver extends BroadcastReceiver{
 		Log.d(TAG,"onReceive GlobalUpdate");
 		Intent statusUpdateIntent = new Intent(context, StatusUpdateService.class);
 		context.startService(statusUpdateIntent);
-
-        Intent beaconUpdateIntent = new Intent(context, StatusUpdateService.class);
-        context.startService(beaconUpdateIntent);
 	}
 }

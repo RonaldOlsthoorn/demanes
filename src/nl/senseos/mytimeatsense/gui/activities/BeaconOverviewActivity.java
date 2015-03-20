@@ -30,6 +30,8 @@ public class BeaconOverviewActivity extends Activity implements AdapterView.OnIt
     public static final String BEACON_MAJOR = "beacon_major";
     public static final String BEACON_MINOR = "beacon_minor";
     public static final String BEACON_TX = "beacon_tx";
+    public static final String BEACON_REMOTE = "beacon_remote";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +39,10 @@ public class BeaconOverviewActivity extends Activity implements AdapterView.OnIt
         setContentView(R.layout.activity_beacon_overview);
 
         db = DBHelper.getDBHelper(this);
-        cursor = db.getAllBeacons();
+        cursor = db.getAllVisibleBeacons();
         beaconAdapter = new SimpleCursorAdapter(this, R.layout.listitem_device,cursor,
-                new String[]{DBHelper.BeaconTable.COLUMN_MAC, DBHelper.BeaconTable.COLUMN_NAME},
-                new int[]{R.id.listitem_device_id, R.id.listitem_device_name},0);
+                new String[]{DBHelper.BeaconTable.COLUMN_NAME},
+                new int[]{R.id.listitem_device_name},0);
 
         ((ListView) findViewById(R.id.beaconList)).setAdapter(beaconAdapter);
         ((ListView) findViewById(R.id.beaconList)).setOnItemClickListener(this);
@@ -63,7 +65,7 @@ public class BeaconOverviewActivity extends Activity implements AdapterView.OnIt
         }
         if (requestCode == REQUEST_NEW_BEACON
                 && resultCode == Activity.RESULT_OK) {
-            beaconAdapter.swapCursor(db.getAllBeacons());
+            beaconAdapter.swapCursor(db.getAllVisibleBeacons());
             beaconAdapter.notifyDataSetChanged();
             return;
         }
@@ -82,7 +84,7 @@ public class BeaconOverviewActivity extends Activity implements AdapterView.OnIt
     @Override
     public void onResume(){
         super.onResume();
-        cursor = db.getAllBeacons();
+        cursor = db.getAllVisibleBeacons();
         beaconAdapter.swapCursor(cursor);
         beaconAdapter.notifyDataSetChanged();
     }
@@ -100,11 +102,12 @@ public class BeaconOverviewActivity extends Activity implements AdapterView.OnIt
         Intent intent = new Intent(this, BeaconActivity.class);
         intent.putExtra(BEACON_ID, cursor.getInt(0));
         intent.putExtra(BEACON_ADDRESS, cursor.getString(1));
-        intent.putExtra(BEACON_NAME, cursor.getString(2));
-        intent.putExtra(BEACON_UUID, cursor.getString(3));
-        intent.putExtra(BEACON_MAJOR, cursor.getInt(4));
-        intent.putExtra(BEACON_MINOR, cursor.getInt(5));
-        intent.putExtra(BEACON_TX, cursor.getInt(6));
+        intent.putExtra(BEACON_NAME, cursor.getString(1));
+        intent.putExtra(BEACON_UUID, cursor.getString(2));
+        intent.putExtra(BEACON_MAJOR, cursor.getInt(3));
+        intent.putExtra(BEACON_MINOR, cursor.getInt(4));
+        intent.putExtra(BEACON_TX, cursor.getInt(5));
+        intent.putExtra(BEACON_REMOTE, cursor.getInt(6));
 
         startActivity(intent);
     }

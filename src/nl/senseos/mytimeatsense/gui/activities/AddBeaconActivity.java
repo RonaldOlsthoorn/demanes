@@ -38,7 +38,6 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
     private Handler mHandler;
-    private ListView deviceList;
     private static final String TAG = AddBeaconActivity.class.getSimpleName();
 
     private static final int REQUEST_ENABLE_BT = 1;
@@ -193,7 +192,6 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
 
     static class ViewHolder {
         TextView deviceName;
-        TextView deviceAddress;
     }
 
     // Adapter for holding devices found through scanning.
@@ -239,7 +237,6 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
             if (view == null) {
                 view = mInflator.inflate(R.layout.listitem_device, null);
                 viewHolder = new ViewHolder();
-                viewHolder.deviceAddress = (TextView) view.findViewById(R.id.listitem_device_id);
                 viewHolder.deviceName = (TextView) view.findViewById(R.id.listitem_device_name);
                 view.setTag(viewHolder);
             } else {
@@ -252,7 +249,6 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
                 viewHolder.deviceName.setText(deviceName);
             else
                 viewHolder.deviceName.setText(R.string.unknown_device);
-            viewHolder.deviceAddress.setText(beacon.getAddress());
 
             return view;
         }

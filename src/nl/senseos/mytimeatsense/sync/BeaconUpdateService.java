@@ -71,9 +71,12 @@ public class BeaconUpdateService extends IntentService {
             boolean labelPresent = false;
             try {
                 labelPresent = cs.hasLabel(Constants.Labels.LABEL_NAME_OFFICE);
+
+                Log.e(TAG, "label present initial: "+labelPresent);
                 // if not present, make one!
                 if (!labelPresent) {
-                    labelPresent = cs.registerLabel(Constants.Labels.LABEL_NAME_OFFICE, "") == 0;
+                    labelPresent = cs.registerLabel(Constants.Labels.LABEL_NAME_OFFICE, "") != -1;
+                    Log.e(TAG, "label present after creation: "+labelPresent);
                 }
             } catch (IOException | JSONException e1) {
                 e1.printStackTrace();
@@ -95,21 +98,25 @@ public class BeaconUpdateService extends IntentService {
 
         Cursor addedBeacons = DB.getUnsavedBeacons();
 
+        Log.e(TAG,"added beacons count: "+addedBeacons.getCount() );
+
         while (addedBeacons.moveToNext()) {
 
             iBeacon beacon = new iBeacon(
                     addedBeacons.getInt(0),
-                    addedBeacons.getInt(7),
+                    addedBeacons.getInt(6),
                     addedBeacons.getString(1),
                     addedBeacons.getString(2),
-                    addedBeacons.getString(3),
+                    addedBeacons.getInt(3),
                     addedBeacons.getInt(4),
-                    addedBeacons.getInt(5),
-                    addedBeacons.getInt(6)
+                    addedBeacons.getInt(5)
             );
 
             try {
                 int remoteId = cs.registerBeacon(beacon);
+
+                Log.e(TAG, "remote id: "+ remoteId);
+
                 beacon.setRemoteId(remoteId);
                 beacon.updateDB(DB);
             } catch (Exception e) {
@@ -119,12 +126,34 @@ public class BeaconUpdateService extends IntentService {
 
         Cursor removedBeacons = DB.getDeletedBeacons();
 
+        Log.e(TAG,"removed beacons count: "+removedBeacons.getCount() );
+
         while (removedBeacons.moveToNext()) {
             try {
-                cs.removeBeacon(removedBeacons.getInt(7));
+                cs.removeBeacon(removedBeacons.getInt(6));
+                DB.deleteOrIgnore(DBHelper.BeaconTable.TABLE_NAME, removedBeacons.getInt(0));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
+        //remove from here
+
+        Cursor c2 = DB.getAllBeacons();
+
+        while(c2.moveToNext()){
+            Log.e(TAG, "beacon "
+                            +c2.getInt(0)+" "
+                            +c2.getString(1)+" "
+                            +c2.getString(2)+" "
+                            +c2.getString(3)+" "
+                            +c2.getInt(4)+" "
+                            +c2.getInt(5)+" "
+                            +c2.getInt(6)+" "
+                            +c2.getInt(7)
+            );
+        }
+        // to here
+
     }
 }

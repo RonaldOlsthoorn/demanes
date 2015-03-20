@@ -17,7 +17,7 @@ public class iBeacon {
     private long localId=-1;
     private long remoteId=-1;
 
-    private String address;
+    private String state;
     private String name;
     private String UUID;
     private int major;
@@ -47,30 +47,30 @@ public class iBeacon {
             tx = ByteConverter.bytesToUnsignedInt(new byte[]{PDU[29]});
         }
 
-        return new iBeacon(device.getAddress(), device.getName(), uuid, major, minor, tx);
+        return new iBeacon(device.getName(), uuid, major, minor, tx);
     }
 
-    public iBeacon(String address, String name, String uuid, int major, int minor, int tx) {
+    public iBeacon(String name, String uuid, int major, int minor, int tx) {
 
-        this.address = address;
         this.name = name;
         UUID = uuid;
         this.major = major;
         this.minor = minor;
         this.tx = tx;
+        state = DBHelper.BeaconTable.STATE_ACTIVE;
     }
 
-    public iBeacon(int localId, int remoteId, String address, String name,
+    public iBeacon(int localId, int remoteId, String name,
                    String uuid, int major, int minor, int tx) {
 
         this.localId = localId;
         this.remoteId = remoteId;
-        this.address = address;
         this.name = name;
         UUID = uuid;
         this.major = major;
         this.minor = minor;
         this.tx = tx;
+        state = DBHelper.BeaconTable.STATE_ACTIVE;
     }
 
     public long getLocalId(){
@@ -121,9 +121,15 @@ public class iBeacon {
         return tx;
     }
 
-    public void setTAG(int tx){
+    public void setTx(int tx){
         this.tx = tx;
     }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getState(){return state;}
 
     public String getName() {
         return name;
@@ -131,14 +137,6 @@ public class iBeacon {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getAddress() {
-        return address;
     }
 
     /**
@@ -162,12 +160,12 @@ public class iBeacon {
 
         ContentValues beacon = new ContentValues();
         beacon.put(DBHelper.BeaconTable.COLUMN_NAME, name);
-        beacon.put(DBHelper.BeaconTable.COLUMN_MAC, address);
         beacon.put(DBHelper.BeaconTable.COLUMN_UUID, UUID);
         beacon.put(DBHelper.BeaconTable.COLUMN_MAJOR, major);
         beacon.put(DBHelper.BeaconTable.COLUMN_MINOR, minor);
         beacon.put(DBHelper.BeaconTable.COLUMN_TX, tx);
         beacon.put(DBHelper.BeaconTable.COLUMN_REMOTE_ID, remoteId);
+        beacon.put(DBHelper.BeaconTable.COLUMN_STATE, DBHelper.BeaconTable.STATE_ACTIVE);
 
         return localId = db.insertOrIgnore(DBHelper.BeaconTable.TABLE_NAME, beacon);
     }
@@ -180,7 +178,6 @@ public class iBeacon {
 
         ContentValues beacon = new ContentValues();
         beacon.put(DBHelper.BeaconTable.COLUMN_NAME, name);
-        beacon.put(DBHelper.BeaconTable.COLUMN_MAC, address);
         beacon.put(DBHelper.BeaconTable.COLUMN_UUID, UUID);
         beacon.put(DBHelper.BeaconTable.COLUMN_MAJOR, major);
         beacon.put(DBHelper.BeaconTable.COLUMN_MINOR, minor);

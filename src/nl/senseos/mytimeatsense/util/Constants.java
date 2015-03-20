@@ -133,6 +133,8 @@ public class Constants {
 
     public static class Labels{
 
+        public static final String LABEL_OFFICE = "label_office";
+
         public static final String LABEL_NAME = "name";
 
         public static final String LABEL_NAME_OFFICE = "Sense Office";

@@ -18,6 +18,7 @@ import java.util.zip.GZIPOutputStream;
 import javax.net.ssl.HttpsURLConnection;
 
 import nl.senseos.mytimeatsense.bluetooth.iBeacon;
+import nl.senseos.mytimeatsense.storage.DBHelper;
 import nl.senseos.mytimeatsense.util.Constants;
 import nl.senseos.mytimeatsense.util.Constants.Auth;
 import nl.senseos.mytimeatsense.util.Constants.GroupPrefs;
@@ -108,7 +109,7 @@ public class CommonSenseAdapter {
 
                 // store the new sensor list
                 Editor authEditor = sAuthPrefs.edit();
-                authEditor.putString(Sensors.BEACON_SENSOR, labels
+                authEditor.putString(Labels.LABEL_OFFICE, labels
                         .getJSONObject(i).toString());
                 authEditor.commit();
 
@@ -147,7 +148,7 @@ public class CommonSenseAdapter {
                     Labels.LABEL_LIST_COMPLETE_TIME, 0);
             boolean isOutdated = System.currentTimeMillis() - cacheTime > CACHE_REFRESH;
 
-            // return cached list of it is still valid
+            // return cached list of labels. it is still valid
             if (false == isOutdated && null != cachedLabels) {
                 return new JSONArray(cachedLabels);
             }
@@ -167,8 +168,6 @@ public class CommonSenseAdapter {
         // request fresh list of labels for this user from CommonSense
         String cookie = sAuthPrefs.getString(Auth.LOGIN_COOKIE, null);
         String url = Url.LABELS_URL+"/all";
-
-        Log.e(TAG, "url: "+url+"   Remove this tag");
 
         Map<String, String> response = request(context, url, METHOD_GET, null, cookie);
 
@@ -525,8 +524,6 @@ public class CommonSenseAdapter {
 		sensor.put("id", id);
 		sensor.put("device", device);
 
-		Log.v(TAG, response.toString());
-
 		JSONArray sensors = getAllSensors();
 		sensors.put(sensor);
 
@@ -548,7 +545,7 @@ public class CommonSenseAdapter {
      *            The name of the sensor.
      * @param description
      *            The sensor description (previously "device_type").
-     * @return The new label ID at CommonSense, or <code>null</code> if the
+     * @return The new label ID at CommonSense, or -1 if the
      *         registration failed.
      * @throws JSONException
      *             In case of invalid sensor details or if the request returned
@@ -590,24 +587,61 @@ public class CommonSenseAdapter {
         }
 
         String content = response.get(RESPONSE_CONTENT);
+
         label = new JSONObject(content).getJSONObject("label");
+
         getAllLabels();
+
+        JSONArray labels = getAllLabels();
+        labels.put(label);
+
+        Editor authEditor = sAuthPrefs.edit();
+        authEditor.putString(Labels.LABEL_LIST_COMPLETE, labels.toString());
+        authEditor.putString(Labels.LABEL_OFFICE, label.toString());
+        authEditor.commit();
+
         int id = label.getInt("id");
         // return the new label ID
         return id;
     }
 
+    public void storeAllBeacons() throws IOException, JSONException {
+
+        JSONArray beacons = getAllBeacons();
+        DBHelper DB = DBHelper.getDBHelper(context);
+
+        for(int i=0; i<beacons.length();i++){
+            iBeacon beacon = new iBeacon(
+                    beacons.getJSONObject(i).getString("name"),
+                    beacons.getJSONObject(i).getString("uuid"),
+                    beacons.getJSONObject(i).getInt("major"),
+                    beacons.getJSONObject(i).getInt("minor"),
+                    0);
+            beacon.setRemoteId(beacons.getJSONObject(i).getInt("id"));
+            beacon.insertDB(DB);
+        }
+    }
+
+
+    /**
+     * requests all the beacons that are attached to the sense office label
+     * @return
+     * @throws IOException
+     * @throws JSONException
+     */
     public JSONArray getAllBeacons() throws IOException, JSONException {
 
         if (null == sAuthPrefs) {
             sAuthPrefs = context.getSharedPreferences(Auth.PREFS_CREDS,
                     Context.MODE_PRIVATE);
         }
-
         String cookie = sAuthPrefs.getString(Auth.LOGIN_COOKIE, null);
 
+        JSONObject label = new JSONObject(sAuthPrefs.getString(Labels.LABEL_OFFICE,""));
+        int labelId = label.getInt("id");
+
         // prepare request to create new sensor
-        String url = Url.BEACONS_URL;
+        String url = Url.LABELS_URL+"/"+labelId+"/beacons";
 
         // perform actual request
         Map<String, String> response = request(context, url, METHOD_GET, null, cookie);
@@ -661,8 +695,6 @@ public class CommonSenseAdapter {
         jBeacon.put("minor", beacon.getMinor());
         postData.put("beacon", jBeacon);
 
-        Log.e(TAG, postData.toString(4));
-
         // perform actual request
         Map<String, String> response = request(context, url, METHOD_POST, postData, cookie);
 
@@ -679,7 +711,30 @@ public class CommonSenseAdapter {
         String content = response.get(RESPONSE_CONTENT);
         jBeacon = new JSONObject(content).getJSONObject("beacon");
         int id = jBeacon.getInt("id");
-        // return the new beacon ID
+
+        JSONObject label = new JSONObject(sAuthPrefs.getString(Labels.LABEL_OFFICE, ""));
+        int labelId = label.getInt("id");
+
+        // register the created beacon.
+        url = Url.BEACONS_URL+"/"+id+"/label";
+
+        postData = new JSONObject();
+        postData.put("label", new JSONObject().put("id", labelId));
+
+        // perform actual request
+        response = request(context, url, METHOD_POST, postData, cookie);
+
+        Log.e(TAG, "url: "+ url+", postdata "+postData.toString(4));
+
+        // check response code
+        code = response.get(RESPONSE_CODE);
+        if (!"200".equals(code)) {
+            Log.w(TAG,
+                    "Failed to register beacon at CommonSense! Response code: "
+                            + code);
+            throw new IOException("Incorrect response from CommonSense: "
+                    + code);
+        }
         return id;
     }
 
@@ -816,8 +871,6 @@ public class CommonSenseAdapter {
 
 		JSONObject postData = new JSONObject();
 		postData.put("users", new JSONArray().put(user));
-		
-		Log.e(TAG, postData.toString(1));
 
 		Map<String, String> response = request(context, url, METHOD_POST, postData, cookie);
 
