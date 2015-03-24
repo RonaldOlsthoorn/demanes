@@ -3,13 +3,11 @@ package nl.senseos.mytimeatsense.sync;
 import java.io.IOException;
 import java.util.GregorianCalendar;
 
-import nl.senseos.mytimeatsense.bluetooth.iBeacon;
 import nl.senseos.mytimeatsense.commonsense.CommonSenseAdapter;
 import nl.senseos.mytimeatsense.commonsense.MsgHandler;
 import nl.senseos.mytimeatsense.util.Constants.Auth;
 import nl.senseos.mytimeatsense.storage.DBHelper;
 import nl.senseos.mytimeatsense.util.Constants.StatusPrefs;
-import nl.senseos.mytimeatsense.util.Constants.Labels;
 
 
 import org.json.JSONArray;
@@ -90,7 +88,7 @@ public class StatusUpdateService extends IntentService {
 			}
 			if (sensorPresent) {
 				Log.v(TAG, "full CS sync");
-				fullSyncTime();
+				fullSyncStatus();
 			}
 
 			// logout
@@ -102,13 +100,13 @@ public class StatusUpdateService extends IntentService {
 		}
 	}
 
-	private void fullSyncTime() {
+	private void fullSyncStatus() {
 
         uploadLocalStatus();
 
 		try {
 			// fetch latest status and update the status in SharedPreferences
-            JSONObject response = cs.fetchTotalTime();
+            JSONObject response = cs.getTotalTime();
 			if (response == null) {
 				return;
 			}
@@ -120,12 +118,14 @@ public class StatusUpdateService extends IntentService {
 			calMidnight.set(GregorianCalendar.SECOND, 0);
 
 			response = cs
-					.fetchStatusBefore(calMidnight.getTimeInMillis() / 1000);
-			JSONObject valueBeforeMidnight = response;
+					.getStatusBefore(calMidnight.getTimeInMillis() / 1000);
+
+			JSONObject statusBeforeMidnight = response;
 
 			response = cs
-					.fetchStatusAfter(calMidnight.getTimeInMillis() / 1000);
-			JSONObject valueAfterMidnight = response;
+					.getStatusAfter(calMidnight.getTimeInMillis() / 1000);
+
+			JSONObject statusAfterMidnight = response;
 
 			calMondayMidnight = new GregorianCalendar();
 			calMondayMidnight.set(GregorianCalendar.DAY_OF_WEEK,
@@ -135,16 +135,16 @@ public class StatusUpdateService extends IntentService {
 			calMondayMidnight.set(GregorianCalendar.SECOND, 0);
 			
 			response = cs
-					.fetchStatusBefore(calMondayMidnight.getTimeInMillis() / 1000);
-			JSONObject valueBeforeMondayMidnight = response;
+					.getStatusBefore(calMondayMidnight.getTimeInMillis() / 1000);
+			JSONObject statusBeforeMondayMidnight = response;
 
 			response = cs
-					.fetchStatusAfter(calMondayMidnight.getTimeInMillis() / 1000);
-			JSONObject valueAfterMondayMidnight = response;
+					.getStatusAfter(calMondayMidnight.getTimeInMillis() / 1000);
+			JSONObject statusAfterMondayMidnight = response;
 
-			updateStatusPrefs(valueCurrent, valueBeforeMidnight,
-					valueAfterMidnight, valueBeforeMondayMidnight,
-					valueAfterMondayMidnight);
+			updateStatusPrefs(valueCurrent, statusBeforeMidnight,
+					statusAfterMidnight, statusBeforeMondayMidnight,
+					statusAfterMondayMidnight);
 
 		} catch (JSONException | IOException e) {
 			e.printStackTrace();
@@ -159,7 +159,7 @@ public class StatusUpdateService extends IntentService {
 
         try {
             // first get the latest update from CS
-            JSONObject response = cs.fetchTotalTime();
+            JSONObject response = cs.getTotalTime();
 
             JSONObject dataPackage;
             // no data points present on CS, upload local value as is
@@ -176,15 +176,24 @@ public class StatusUpdateService extends IntentService {
                         lastUpdateTotalTime);
             }
             // update and upload to CS
-            int res = cs.sendBeaconData(dataPackage);
-            if (res == 0) {
-                DB.deleteAllRows(DBHelper.DetectionTable.TABLE_NAME);
-            }
+            cs.sendBeaconData(dataPackage);
+            DB.deleteAllRows(DBHelper.DetectionTable.TABLE_NAME);
         }catch (JSONException | IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Calculates the new status: total time, time spent this week and time spent today and
+     * saves the new status in the shared preferences.
+     *
+     * @param valueCurrent JSONObject containing the latest status on CS.
+     * @param valueBeforeMidnight JSONObject containing the latest status on CS before midnight.
+     * @param valueAfterMidnight JSONObject containing the first status on CS after midnight
+     * @param valueBeforeMondayMidnight JSONObject containing the latest status on CS before the
+     * the beginning of this week
+     * @param valueAfterMondayMidnight
+     */
     private void updateStatusPrefs(JSONObject valueCurrent,
 			JSONObject valueBeforeMidnight, JSONObject valueAfterMidnight,
 			JSONObject valueBeforeMondayMidnight,
@@ -205,44 +214,42 @@ public class StatusUpdateService extends IntentService {
 
 			long todayMidnight;
 
-			if (valueBeforeMidnight.getJSONArray("data").length() == 0) {
+            // No measurement before midnight. Take the first after midnight
+			if (valueBeforeMidnight == null) {
 				todayMidnight = new JSONObject(valueAfterMidnight
-						.getJSONArray("data").getJSONObject(0)
 						.getString("value")).getLong("total_time");
-			} else if (valueAfterMidnight.getJSONArray("data").length() == 0) {
+			}
+            // No measurement after midnight. Take the first before midnight
+            else if (valueAfterMidnight == null) {
 				todayMidnight = new JSONObject(valueBeforeMidnight
-						.getJSONArray("data").getJSONObject(0)
 						.getString("value")).getLong("total_time");
-			} else {
+			}
+            // Both before and after midnight, measurement is available.
+            else {
+
 				long beforeMidnight = new JSONObject(valueBeforeMidnight
-						.getJSONArray("data").getJSONObject(0)
 						.getString("value")).getLong("total_time");
 				boolean beforeMidnightStatus = new JSONObject(
-						valueBeforeMidnight.getJSONArray("data")
-								.getJSONObject(0).getString("value"))
+						valueBeforeMidnight.getString("value"))
 						.getBoolean("status");
-				long beforeMidnightTS = valueBeforeMidnight
-						.getJSONArray("data").getJSONObject(0).getLong("date");
+				long beforeMidnightTS = valueBeforeMidnight.getLong("date");
 				long afterMidnight = new JSONObject(valueAfterMidnight
-						.getJSONArray("data").getJSONObject(0)
 						.getString("value")).getLong("total_time");
 				boolean afterMidnightStatus = new JSONObject(
-						valueBeforeMidnight.getJSONArray("data")
-								.getJSONObject(0).getString("value"))
+						valueBeforeMidnight.getString("value"))
 						.getBoolean("status");
-				long afterMidnightTS = valueAfterMidnight.getJSONArray("data")
-						.getJSONObject(0).getLong("date");
+				long afterMidnightTS = valueAfterMidnight.getLong("date");
+
 
 				if ((!beforeMidnightStatus && !afterMidnightStatus)
 						|| (afterMidnightTS - beforeMidnightTS > LocalUpdateService.TIME_OUT_LIMIT)) {
 					todayMidnight = beforeMidnight;
-				} else if (beforeMidnightStatus && !afterMidnightStatus) {
-					todayMidnight = afterMidnight;
-				} else if (!beforeMidnightStatus && afterMidnightStatus) {
+				} else if (beforeMidnightStatus && !afterMidnightStatus  ||
+                        !beforeMidnightStatus && afterMidnightStatus) {
 					todayMidnight = afterMidnight;
 				} else {
 					todayMidnight = afterMidnight
-							+ (beforeMidnightTS - (calMidnight
+							- (afterMidnightTS - (calMidnight
 									.getTimeInMillis() / 1000));
 				}
 			}
@@ -254,32 +261,24 @@ public class StatusUpdateService extends IntentService {
 			if (valueBeforeMondayMidnight.getJSONArray("data").length() == 0) {
 				
 				mondayMidnight = new JSONObject(valueAfterMondayMidnight
-						.getJSONArray("data").getJSONObject(0)
 						.getString("value")).getLong("total_time");
 			} else if (valueAfterMondayMidnight.getJSONArray("data").length() == 0) {
 
 				mondayMidnight = new JSONObject(valueBeforeMondayMidnight
-						.getJSONArray("data").getJSONObject(0)
 						.getString("value")).getLong("total_time");
 			} else {
 
 				long beforeMidnight = new JSONObject(valueBeforeMondayMidnight
-						.getJSONArray("data").getJSONObject(0)
 						.getString("value")).getLong("total_time");
 				boolean beforeMidnightStatus = new JSONObject(
-						valueBeforeMondayMidnight.getJSONArray("data")
-								.getJSONObject(0).getString("value"))
+						valueBeforeMondayMidnight.getString("value"))
 						.getBoolean("status");
-				long beforeMidnightTS = valueBeforeMondayMidnight
-						.getJSONArray("data").getJSONObject(0).getLong("date");
+				long beforeMidnightTS = valueBeforeMondayMidnight.getLong("date");
 				long afterMidnight = new JSONObject(valueAfterMondayMidnight
-						.getJSONArray("data").getJSONObject(0)
 						.getString("value")).getLong("total_time");
-				long afterMidnightTS = valueAfterMondayMidnight
-						.getJSONArray("data").getJSONObject(0).getLong("date");
+				long afterMidnightTS = valueAfterMondayMidnight.getLong("date");
 				boolean afterMidnightStatus = new JSONObject(
-						valueBeforeMondayMidnight.getJSONArray("data")
-								.getJSONObject(0).getString("value"))
+						valueBeforeMondayMidnight.getString("value"))
 						.getBoolean("status");
 
 				if ((!beforeMidnightStatus && !afterMidnightStatus)
@@ -290,12 +289,11 @@ public class StatusUpdateService extends IntentService {
 				} else if (!beforeMidnightStatus && afterMidnightStatus) {
 					mondayMidnight = afterMidnight;
 				} else {
-					mondayMidnight = beforeMidnight
-							+ (afterMidnightTS - (calMondayMidnight
+					mondayMidnight = afterMidnight
+							- (afterMidnightTS - (calMondayMidnight
 									.getTimeInMillis() / 1000));
 				}
 			}
-			
 			statusEditor.putLong(StatusPrefs.STATUS_TIME_WEEK, totalTime
 					- mondayMidnight);
 
@@ -322,23 +320,27 @@ public class StatusUpdateService extends IntentService {
 		long leaderTs = 0;
 		
 		Cursor log = DB.getCompleteLog();
-		
-		log.moveToFirst();
 
-		while (log.getPosition() < log.getCount()) {
+		// Time increments are calculated for each pair of consecutive scans: The leader
+        // and Follower.
+		while (log.moveToNext()) {
 
 			dataToken = new JSONObject();
 
 			leader = log.getInt(2) > 0;
 			leaderTs = log.getLong(1);
 
+            // if time span between two scans is too big, consider the intermediate time
+            // as NOT spent at the office. Also when two consecutive scans detected absent
 			if (leaderTs - followerTs > LocalUpdateService.TIME_OUT_LIMIT
 					|| (!leader && !follower)) {
 				Log.e(TAG,"time out "+leaderTs+","+followerTs);
 				dataToken.put("value", "{\"total_time\":" + total + ","
 						+ "\"status\":" + Boolean.toString(leader) + "}");
-			} else if ((!leader && follower) ||(leader && !follower) ) {
-
+			}
+            // if a sequence of present - absent is detected in consecutive scans
+            // or reverse, approximately half of the time is spent at the office.
+            else if ((!leader && follower) ||(leader && !follower) ) {
 				long delta = (1 / 2) * (leaderTs - followerTs);
 				total = total + delta;
 				dataToken.put("value", "{\"total_time\":" + total + ","
@@ -354,10 +356,7 @@ public class StatusUpdateService extends IntentService {
 
 			follower = leader;
 			followerTs = leaderTs;
-
-			log.moveToNext();
 		}
-
 		res.put("data", dataArray);
 		return res;
 	}

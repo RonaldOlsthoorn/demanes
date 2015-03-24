@@ -63,6 +63,7 @@ public class Constants {
 		public static final String PREFS_CONNECTION = "prefs_connection";
 
 	}
+
 	public static class Url{
 		/** Host name of CommonSense API */
 	    public static final String API_URL = "https://api.sense-os.nl/";
@@ -132,6 +133,8 @@ public class Constants {
 	}
 
     public static class Labels{
+
+        public static final String PREFS_LABELS = "prefs_labels";
 
         public static final String LABEL_OFFICE = "label_office";
 

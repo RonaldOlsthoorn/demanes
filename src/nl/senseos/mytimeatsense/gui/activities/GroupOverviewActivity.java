@@ -128,7 +128,7 @@ public class GroupOverviewActivity extends Activity {
 					if (!cs.isGroupMember(GroupPrefs.GROUP_ID)) {
 						cs.joinGroup(GroupPrefs.GROUP_ID);
 					}
-					response = cs.fetchGroupResult();
+					response = cs.getGroupResult();
 					result = new JSONArray(response.getJSONArray("data")
 							.getJSONObject(0).getString("value"));
 					cs.logout();
