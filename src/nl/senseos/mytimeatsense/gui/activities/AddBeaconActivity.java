@@ -33,11 +33,9 @@ import nl.senseos.mytimeatsense.sync.StatusUpdateService;
 
 public class AddBeaconActivity extends Activity implements OnItemClickListener {
 
-    private DBHelper db;
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
-    private Handler mHandler;
     private static final String TAG = AddBeaconActivity.class.getSimpleName();
 
     private static final int REQUEST_ENABLE_BT = 1;
@@ -49,7 +47,6 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_beacon);
         getActionBar().setTitle(R.string.title_devices);
-        mHandler = new Handler();
 
         // Use this check to determine whether BLE is supported on the device.  Then you can
         // selectively disable BLE-related features.
@@ -70,7 +67,7 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
             finish();
             return;
         }
-        db = DBHelper.getDBHelper(this);
+
     }
 
 
@@ -147,6 +144,7 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
 
             Log.e(TAG, "scanning enable: " + enable);
             // Stops scanning after a pre-defined scan period.
+            Handler mHandler = new Handler();
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -258,6 +256,7 @@ public class AddBeaconActivity extends Activity implements OnItemClickListener {
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
         iBeacon beacon = (iBeacon) parent.getItemAtPosition(position);
+        DBHelper db = DBHelper.getDBHelper(this);
         long res = beacon.insertDB(db);
 
         if (res == -1) {

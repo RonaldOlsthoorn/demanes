@@ -56,7 +56,6 @@ public class BluetoothLeScanService extends Service {
 
         // if initialization succeeds, scan for devices
         if(initialize()){
-            db = DBHelper.getDBHelper(this);
             scanLeDevice();
         }
         return START_STICKY;
@@ -83,6 +82,7 @@ public class BluetoothLeScanService extends Service {
 			Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
 			return false;
 		}
+        db = DBHelper.getDBHelper(this);
 		return true;
 	}
 
@@ -148,20 +148,6 @@ public class BluetoothLeScanService extends Service {
 			}
 		}
 	};
-
-	// characters used to display hexadecimal numbers
-	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
-
-	// convert byte array to hexadecimal string
-	public String bytesToHex(byte[] bytes) {
-		char[] hexChars = new char[bytes.length * 2];
-		for (int j = 0; j < bytes.length; j++) {
-			int v = bytes[j] & 0xFF;
-			hexChars[j * 2] = hexArray[v >>> 4];
-			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-		}
-		return new String(hexChars);
-	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
