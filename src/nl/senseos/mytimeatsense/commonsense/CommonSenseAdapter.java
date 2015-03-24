@@ -44,9 +44,9 @@ import android.util.Log;
  */
 public class CommonSenseAdapter {
 
-	private static CommonSenseAdapter instance;
 	private static SharedPreferences sAuthPrefs;
-	private static SharedPreferences sMainPrefs;
+	private static SharedPreferences sSensorPrefs;
+
 	private static final long CACHE_REFRESH = 1000l * 60 * 60; // 1 hour
 	private static final String TAG = CommonSenseAdapter.class.getSimpleName();
     private static final String METHOD_GET = "GET";
@@ -259,11 +259,16 @@ public class CommonSenseAdapter {
 					Context.MODE_PRIVATE);
 		}
 
+        if (null == sSensorPrefs) {
+            sSensorPrefs = context.getSharedPreferences(Sensors.PREFS_SENSORS,
+                    Context.MODE_PRIVATE);
+        }
+
 		// try to get list of sensors from the cache
 		try {
-			String cachedSensors = sAuthPrefs.getString(
+			String cachedSensors = sSensorPrefs.getString(
 					Sensors.SENSOR_LIST_COMPLETE, null);
-			long cacheTime = sAuthPrefs.getLong(
+			long cacheTime = sSensorPrefs.getLong(
 					Sensors.SENSOR_LIST_COMPLETE_TIME, 0);
 			boolean isOutdated = System.currentTimeMillis() - cacheTime > CACHE_REFRESH;
 
@@ -318,11 +323,11 @@ public class CommonSenseAdapter {
 		}
 
 		// store the new sensor list
-		Editor authEditor = sAuthPrefs.edit();
-		authEditor.putString(Sensors.SENSOR_LIST_COMPLETE, result.toString());
-		authEditor.putLong(Sensors.SENSOR_LIST_COMPLETE_TIME,
-				System.currentTimeMillis());
-		authEditor.commit();
+		Editor sensorEditor = sSensorPrefs.edit();
+		sensorEditor.putString(Sensors.SENSOR_LIST_COMPLETE, result.toString());
+		sensorEditor.putLong(Sensors.SENSOR_LIST_COMPLETE_TIME,
+                System.currentTimeMillis());
+		sensorEditor.commit();
 
 		return result;
 	}
@@ -341,6 +346,11 @@ public class CommonSenseAdapter {
 					Context.MODE_PRIVATE);
 		}
 
+        if (null == sSensorPrefs) {
+            sSensorPrefs = context.getSharedPreferences(Sensors.PREFS_SENSORS,
+                    Context.MODE_PRIVATE);
+        }
+
 		String id = registerSensor(context, Sensors.BEACON_SENSOR_NAME,
 				Sensors.BEACON_SENSOR_DISPLAY_NAME,
 				Sensors.BEACON_SENSOR_DESCRIPTION,
@@ -351,7 +361,7 @@ public class CommonSenseAdapter {
 			return false;
 		}
 
-		JSONArray sensors = new JSONArray(sAuthPrefs.getString(
+		JSONArray sensors = new JSONArray(sSensorPrefs.getString(
 				Sensors.SENSOR_LIST_COMPLETE, null));
 
 		if (sensors.length() == 0) {
@@ -485,10 +495,10 @@ public class CommonSenseAdapter {
 			sensor.put("device", device);
 			JSONArray sensors = getAllSensors();
 			sensors.put(sensor);
-			Editor authEditor = sAuthPrefs.edit();
-			authEditor.putString(Sensors.SENSOR_LIST_COMPLETE,
+			Editor sensorEditor = sSensorPrefs.edit();
+            sensorEditor.putString(Sensors.SENSOR_LIST_COMPLETE,
 					sensors.toString());
-			authEditor.commit();
+            sensorEditor.commit();
 			return id;
 		}
 

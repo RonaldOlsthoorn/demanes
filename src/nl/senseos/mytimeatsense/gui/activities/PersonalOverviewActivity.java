@@ -56,6 +56,9 @@ public class PersonalOverviewActivity extends Activity {
 	public static final long REPEAT_INTEVAL_MINS_BLE = 5;
 	public static final long REPEAT_INTEVAL_MINS_UPLOAD = 31;
 
+    public static final String STATUS_PRESENT = "Status: in the sense office";
+    public static final String STATUS_ABSENT = "Status: not in the sense office";
+
 	private AlarmManager alarmMgr;
 	private SharedPreferences statusPrefs;
 
@@ -129,11 +132,11 @@ public class PersonalOverviewActivity extends Activity {
 		statusPrefs = getSharedPreferences(StatusPrefs.PREFS_STATUS,
 				Context.MODE_PRIVATE);
 
-		setTimers();
+		setUpdateTimers();
 
 	}
 
-    public void setTimers(){
+    public void setUpdateTimers(){
 
         BleServiceIntent = new Intent(this, BleAlarmReceiver.class);
         BlePendingIntent = PendingIntent.getBroadcast(this, 2,
@@ -171,7 +174,7 @@ public class PersonalOverviewActivity extends Activity {
 			return;
 		}
 
-        setTimers();
+        setUpdateTimers();
 
 		statusPrefs = getSharedPreferences(StatusPrefs.PREFS_STATUS,
 				Context.MODE_PRIVATE);
@@ -225,7 +228,7 @@ public class PersonalOverviewActivity extends Activity {
 
 					SharedPreferences sSensorPrefs = getSharedPreferences(
 							Sensors.PREFS_SENSORS, Context.MODE_PRIVATE);
-					Editor sensorEditor = sAuthPrefs.edit();
+					Editor sensorEditor = sSensorPrefs.edit();
 					sensorEditor.putLong(Sensors.SENSOR_LIST_COMPLETE_TIME, 0);
 					sensorEditor.putString(Sensors.SENSOR_LIST_COMPLETE, null);
 					sensorEditor.putString(Sensors.BEACON_SENSOR, null);
@@ -337,7 +340,7 @@ public class PersonalOverviewActivity extends Activity {
 
 			if (statusPrefs.getBoolean(StatusPrefs.STATUS_IN_OFFICE, false)) {
 
-				status.setText("Status: in the sense office");
+				status.setText(STATUS_PRESENT);
 				currentTimeInSeconds = System.currentTimeMillis() / 1000;
 				timeDifferenceSeconds = currentTimeInSeconds
 						- statusPrefs.getLong(StatusPrefs.STATUS_TIMESTAMP, 0);
@@ -345,59 +348,52 @@ public class PersonalOverviewActivity extends Activity {
 				displayTime = statusPrefs.getLong(StatusPrefs.STATUS_TOTAL_TIME, 0)
 						+ timeDifferenceSeconds;
 
-                Clock clock = new Clock(displayTime);
-
-				thisLifeDays.setText(clock.getDays());
-				thisLifeHours.setText(clock.getHours());
-				thisLifeMinutes.setText(clock.getMinutes());
-				thisLifeSeconds.setText(clock.getSeconds());
+                Clock thisLife = new Clock(displayTime);
 						
 				displayTime = statusPrefs.getLong(StatusPrefs.STATUS_TIME_WEEK, 0)
 						+ timeDifferenceSeconds;
 
-                clock = new Clock(displayTime);
-
-                thisWeekDays.setText(clock.getDays());
-                thisWeekHours.setText(clock.getHours());
-                thisWeekMinutes.setText(clock.getMinutes());
-                thisWeekSeconds.setText(clock.getSeconds());
+                Clock thisWeek = new Clock(displayTime);
 				
 				displayTime = statusPrefs.getLong(StatusPrefs.STATUS_TIME_TODAY, 0)
 						+ timeDifferenceSeconds;
 
-                clock = new Clock(displayTime);
+                Clock today = new Clock(displayTime);
 				
-				todayHours.setText(clock.getHours());
-				todayMinutes.setText(clock.getMinutes());
-				todaySeconds.setText(clock.getSeconds());
+				setClocks(today, thisWeek, thisLife);
 
 			} else {
-				status.setText("Status: not in the sense office");
+				status.setText(STATUS_ABSENT);
 
 				displayTime = statusPrefs.getLong(StatusPrefs.STATUS_TOTAL_TIME, 0);
-                Clock clock = new Clock(displayTime);
-
-                thisLifeDays.setText(clock.getDays());
-                thisLifeHours.setText(clock.getHours());
-                thisLifeMinutes.setText(clock.getMinutes());
-                thisLifeSeconds.setText(clock.getSeconds());
+                Clock thisLife = new Clock(displayTime);
 				
 				displayTime = statusPrefs.getLong(StatusPrefs.STATUS_TIME_WEEK, 0);
-                clock = new Clock(displayTime);
+                Clock thisWeek = new Clock(displayTime);
 
-                thisWeekDays.setText(clock.getDays());
-                thisWeekHours.setText(clock.getHours());
-                thisWeekMinutes.setText(clock.getMinutes());
-                thisWeekSeconds.setText(clock.getSeconds());
+   				displayTime = statusPrefs.getLong(StatusPrefs.STATUS_TIME_TODAY, 0);
+                Clock today = new Clock(displayTime);
 
-				displayTime = statusPrefs.getLong(StatusPrefs.STATUS_TIME_TODAY, 0);
-                clock = new Clock(displayTime);
-
-                todayHours.setText(clock.getHours());
-                todayMinutes.setText(clock.getMinutes());
-                todaySeconds.setText(clock.getSeconds());
+                setClocks(today, thisWeek, thisLife);
 			}
 			timerHandler.postDelayed(this, 1000);
 		}
 	};
+
+    public void setClocks(Clock today, Clock thisWeek, Clock thisLife){
+
+        todayHours.setText(today.getHours());
+        todayMinutes.setText(today.getMinutes());
+        todaySeconds.setText(today.getSeconds());
+
+        thisWeekDays.setText(thisWeek.getDays());
+        thisWeekHours.setText(thisWeek.getHours());
+        thisWeekMinutes.setText(thisWeek.getMinutes());
+        thisWeekSeconds.setText(thisWeek.getSeconds());
+
+        thisLifeDays.setText(thisLife.getDays());
+        thisLifeHours.setText(thisLife.getHours());
+        thisLifeMinutes.setText(thisLife.getMinutes());
+        thisLifeSeconds.setText(thisLife.getSeconds());
+    }
 }
