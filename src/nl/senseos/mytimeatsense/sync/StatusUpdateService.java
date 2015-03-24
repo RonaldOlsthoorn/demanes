@@ -258,11 +258,11 @@ public class StatusUpdateService extends IntentService {
 
 			long mondayMidnight;
 
-			if (valueBeforeMondayMidnight.getJSONArray("data").length() == 0) {
+			if (valueBeforeMondayMidnight == null) {
 				
 				mondayMidnight = new JSONObject(valueAfterMondayMidnight
 						.getString("value")).getLong("total_time");
-			} else if (valueAfterMondayMidnight.getJSONArray("data").length() == 0) {
+			} else if (valueAfterMondayMidnight == null) {
 
 				mondayMidnight = new JSONObject(valueBeforeMondayMidnight
 						.getString("value")).getLong("total_time");

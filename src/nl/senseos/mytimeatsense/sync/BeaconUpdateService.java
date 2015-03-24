@@ -70,7 +70,7 @@ public class BeaconUpdateService extends IntentService {
             // check if beacon label is present
             boolean labelPresent = false;
             try {
-                labelPresent = cs.hasLabel(Constants.Labels.LABEL_NAME_OFFICE);
+                labelPresent = cs.hasLabel();
 
                 Log.e(TAG, "label present initial: "+labelPresent);
                 // if not present, make one!

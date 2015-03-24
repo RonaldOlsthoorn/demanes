@@ -297,12 +297,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 					mLoginHandler.sendMessage(msg);
 					return;
 				}
-				res = cs.getUserInfo();
-				if (res != 0) {
-					msg.arg1=0;
-					mLoginHandler.sendMessage(msg);
-					return;
-				}
+				cs.getUserInfo();
                 cs.storeAllBeacons();
 				cs.logout();
 				msg.arg1=1;
