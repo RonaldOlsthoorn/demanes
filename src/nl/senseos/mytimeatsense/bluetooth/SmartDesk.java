@@ -33,7 +33,7 @@ public class SmartDesk {
         }
 
         SmartDesk res = new SmartDesk(deskId);
-        res.setChair(new SmartChair(new iBeacon(device, uuid, major, minor, tx)));
+        res.setChair(new SmartChair(new iBeacon(device.getName(), uuid, major, minor, tx)));
 
         return res;
     }

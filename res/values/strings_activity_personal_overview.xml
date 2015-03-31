@@ -2,13 +2,12 @@
 <resources>
     
     <string name="title_activity_personal_overview">BLE Detection</string>
-    <string name="status">Status: </string>
-    <string name="today">Today: </string>
-    <string name="this_week">This week: </string>
-    <string name="this_life">This life: </string>
-    <string name="status_present">Status: in the Sense office</string>
-    <string name="status_absent">Status: outside the Sense office</string>
-    <string name="to_group_overview">Compare with your colleagues</string>
+    <string name="status_absent">No device detected</string>
+    <string name="status_desk_1">Status: desk 1 </string>
+    <string name="status_desk_2">Status: desk 2 </string>
+    <string name="status_desk_3">Status: desk 3 </string>
+    <string name="status_desk_4">Status: desk 4 </string>
+    <string name="status_bike">Status: cycling</string>
     <string name="error_register_sensor_fail">Unable to register device</string>
       
 </resources>

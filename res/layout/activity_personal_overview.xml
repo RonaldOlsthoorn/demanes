@@ -20,18 +20,11 @@
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
 
-    <ScrollView
-        android:id="@+id/personal_overview_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/personal_overview_footer"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" >
-
-        <LinearLayout
+    <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" >
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/personal_overview_header">
 
             <TextView
                 android:id="@+id/textView1"
@@ -50,380 +43,68 @@
                 android:text="@string/status_absent"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/today"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+    </LinearLayout>
 
-            <TableLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center" >
-
-                <TableRow
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center" >
-
-                    <TextView
-                        android:id="@+id/personal_overview_today_hour"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="00"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=":"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:id="@+id/personal_overview_today_minute"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="00"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=":"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:id="@+id/personal_overview_today_seconds"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="00"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center" >
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/hours"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" "
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/minutes"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" "
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/seconds"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-                </TableRow>
-            </TableLayout>
-
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:gravity="center"
-                android:text="@string/this_week"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TableLayout
-                android:id="@+id/tableLayout2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-
-                <TableRow
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center" >
-
-                    <TextView
-                        android:id="@+id/personal_overview_this_week_day"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="0"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" "
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:id="@+id/personal_overview_this_week_hour"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="00"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=":"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:id="@+id/personal_overview_this_week_minute"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="00"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=":"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:id="@+id/personal_overview_this_week_second"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="00"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center" >
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="days"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" "
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="hh"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" "
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="mm"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" "
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="ss"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-                </TableRow>
-            </TableLayout>
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:gravity="center"
-                android:text="@string/this_life"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TableLayout
-                android:id="@+id/tableLayout3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-
-                <TableRow
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center" >
-
-                    <TextView
-                        android:id="@+id/personal_overview_this_life_day"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="0"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" "
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:id="@+id/personal_overview_this_life_hour"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="00"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=":"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:id="@+id/personal_overview_this_life_minute"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="00"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=":"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                    <TextView
-                        android:id="@+id/personal_overview_this_life_second"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="00"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center" >
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/days"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" "
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/hours"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" "
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/minutes"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" "
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/seconds"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-                </TableRow>
-            </TableLayout>
-        </LinearLayout>
-
-    </ScrollView>
-
-    <LinearLayout
-        android:id="@+id/personal_overview_footer"
-        android:orientation="horizontal"
+    <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true">
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true">
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Beacons"
-            android:id="@+id/button3"
-            android:layout_weight="0.5"
-            android:onClick="toBeacons" />
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center"
+            android:gravity="center">
 
-        <Button
-            android:id="@+id/personal_overview_to_group"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:onClick="toGroup"
-            android:text="@string/to_group_overview"
-            android:layout_weight="0.5" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView"
+                android:layout_column="0"
+                android:src="@drawable/desk_empty"
+                android:layout_margin="10dp" />
 
-    </LinearLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView2"
+                android:layout_column="1"
+                android:src="@drawable/desk_empty"
+                android:layout_margin="10dp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView3"
+                android:layout_column="0"
+                android:src="@drawable/desk_empty"
+                android:layout_margin="10dp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView4"
+                android:layout_column="1"
+                android:src="@drawable/desk_empty"
+                android:layout_margin="10dp" />
+        </TableRow>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView5"
+            android:src="@drawable/bicycle_empty"
+            android:layout_margin="10dp"
+            android:layout_gravity="center_horizontal" />
+    </TableLayout>
+
+
 
 </RelativeLayout>

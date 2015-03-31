@@ -37,27 +37,13 @@ public class PersonalOverviewActivity extends Activity {
 	private final int REQUEST_ENABLE_BT = 10;
 	private final int REQUEST_CREDENTIALS = 20;
 
-	private TextView todayHours;
-	private TextView todayMinutes;
-	private TextView todaySeconds;
-	
-	private TextView thisWeekDays;
-	private TextView thisWeekHours;
-	private TextView thisWeekMinutes;
-	private TextView thisWeekSeconds;
-
-	private TextView thisLifeDays;
-	private TextView thisLifeHours;
-	private TextView thisLifeMinutes;
-	private TextView thisLifeSeconds;
-
 	private TextView status;
 
-	public static final long REPEAT_INTEVAL_MINS_BLE = 5;
-	public static final long REPEAT_INTEVAL_MINS_UPLOAD = 31;
+	public static final long REPEAT_INTEVAL_MINS_BLE = 1;
+	public static final long REPEAT_INTEVAL_MINS_UPLOAD = 5;
 
-    public static final String STATUS_PRESENT = "Status: in the sense office";
-    public static final String STATUS_ABSENT = "Status: not in the sense office";
+    public static final String STATUS_PRESENT = "Status: in the office";
+    public static final String STATUS_ABSENT = "Status: not in the office";
 
 	private AlarmManager alarmMgr;
 	private SharedPreferences statusPrefs;
@@ -275,20 +261,6 @@ public class PersonalOverviewActivity extends Activity {
 
 		statusPrefs = getSharedPreferences(StatusPrefs.PREFS_STATUS,
 				Context.MODE_PRIVATE);
-
-		todayHours = (TextView) findViewById(R.id.personal_overview_today_hour);
-		todayMinutes = (TextView) findViewById(R.id.personal_overview_today_minute);
-		todaySeconds = (TextView) findViewById(R.id.personal_overview_today_seconds);
-
-		thisWeekDays = (TextView) findViewById(R.id.personal_overview_this_week_day);
-		thisWeekHours = (TextView) findViewById(R.id.personal_overview_this_week_hour);
-		thisWeekMinutes = (TextView) findViewById(R.id.personal_overview_this_week_minute);
-		thisWeekSeconds = (TextView) findViewById(R.id.personal_overview_this_week_second);
-
-		thisLifeDays = (TextView) findViewById(R.id.personal_overview_this_life_day);
-		thisLifeHours = (TextView) findViewById(R.id.personal_overview_this_life_hour);
-		thisLifeMinutes = (TextView) findViewById(R.id.personal_overview_this_life_minute);
-		thisLifeSeconds = (TextView) findViewById(R.id.personal_overview_this_life_second);
 		
 		status = (TextView) findViewById(R.id.personal_overview_status);
 
@@ -338,62 +310,11 @@ public class PersonalOverviewActivity extends Activity {
 
 		public void run() {
 
-			if (statusPrefs.getBoolean(StatusPrefs.STATUS_IN_OFFICE, false)) {
-
-				status.setText(STATUS_PRESENT);
-				currentTimeInSeconds = System.currentTimeMillis() / 1000;
-				timeDifferenceSeconds = currentTimeInSeconds
-						- statusPrefs.getLong(StatusPrefs.STATUS_TIMESTAMP, 0);
-
-				displayTime = statusPrefs.getLong(StatusPrefs.STATUS_TOTAL_TIME, 0)
-						+ timeDifferenceSeconds;
-
-                Clock thisLife = new Clock(displayTime);
-						
-				displayTime = statusPrefs.getLong(StatusPrefs.STATUS_TIME_WEEK, 0)
-						+ timeDifferenceSeconds;
-
-                Clock thisWeek = new Clock(displayTime);
-				
-				displayTime = statusPrefs.getLong(StatusPrefs.STATUS_TIME_TODAY, 0)
-						+ timeDifferenceSeconds;
-
-                Clock today = new Clock(displayTime);
-				
-				setClocks(today, thisWeek, thisLife);
-
-			} else {
-				status.setText(STATUS_ABSENT);
-
-				displayTime = statusPrefs.getLong(StatusPrefs.STATUS_TOTAL_TIME, 0);
-                Clock thisLife = new Clock(displayTime);
-				
-				displayTime = statusPrefs.getLong(StatusPrefs.STATUS_TIME_WEEK, 0);
-                Clock thisWeek = new Clock(displayTime);
-
-   				displayTime = statusPrefs.getLong(StatusPrefs.STATUS_TIME_TODAY, 0);
-                Clock today = new Clock(displayTime);
-
-                setClocks(today, thisWeek, thisLife);
-			}
 			timerHandler.postDelayed(this, 1000);
 		}
 	};
 
-    public void setClocks(Clock today, Clock thisWeek, Clock thisLife){
+    public void setStatus(){
 
-        todayHours.setText(today.getHours());
-        todayMinutes.setText(today.getMinutes());
-        todaySeconds.setText(today.getSeconds());
-
-        thisWeekDays.setText(thisWeek.getDays());
-        thisWeekHours.setText(thisWeek.getHours());
-        thisWeekMinutes.setText(thisWeek.getMinutes());
-        thisWeekSeconds.setText(thisWeek.getSeconds());
-
-        thisLifeDays.setText(thisLife.getDays());
-        thisLifeHours.setText(thisLife.getHours());
-        thisLifeMinutes.setText(thisLife.getMinutes());
-        thisLifeSeconds.setText(thisLife.getSeconds());
     }
 }
