@@ -50,12 +50,21 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 				null);
 	}
 
+    public Cursor getBeacon(int id){
+
+        SQLiteDatabase db;
+        db = getReadableDatabase();
+        return db.query(BeaconTable.TABLE_NAME, null,
+                BeaconTable.COLUMN_NAME_ID +" = ?",
+                new String[]{Integer.toString(id)}, null, null, null);
+    }
+
     public Cursor getAllVisibleBeacons(){
 
         SQLiteDatabase db;
         db = getReadableDatabase();
         return db.query(BeaconTable.TABLE_NAME, null,
-                BeaconTable.COLUMN_STATE+" LIKE ?",
+                BeaconTable.COLUMN_NAME_STATE +" LIKE ?",
                 new String[]{BeaconTable.STATE_ACTIVE}, null, null, null);
     }
 
@@ -71,7 +80,7 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
         SQLiteDatabase db;
         db = getReadableDatabase();
         return db.query(BeaconTable.TABLE_NAME, null,
-                BeaconTable.TABLE_NAME+'.'+BeaconTable.COLUMN_REMOTE_ID+"= -1",
+                BeaconTable.TABLE_NAME+'.'+BeaconTable.COLUMN_NAME_REMOTE_ID +"= -1",
                 null, null, null, null);
     }
 
@@ -79,7 +88,7 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 
         SQLiteDatabase db = getWritableDatabase();
         Cursor c = db.query(BeaconTable.TABLE_NAME, null,
-                BeaconTable.COLUMN_ID+"=?",new String[]{String.valueOf(beacon.getLocalId())},
+                BeaconTable.COLUMN_NAME_ID +"=?",new String[]{String.valueOf(beacon.getLocalId())},
                 null, null, null);
 
         if(c.getCount()==0){
@@ -95,7 +104,7 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
         }else{
             //otherwise mark for deletion
             ContentValues v = new ContentValues();
-            v.put(BeaconTable.COLUMN_STATE, BeaconTable.STATE_INACTIVE);
+            v.put(BeaconTable.COLUMN_NAME_STATE, BeaconTable.STATE_INACTIVE);
             updateOrIgnore(BeaconTable.TABLE_NAME,beacon.getLocalId(),v);
         }
         getMatchingBeacon(beacon);
@@ -104,7 +113,7 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
     public Cursor getDeletedBeacons(){
 
         SQLiteDatabase db= getReadableDatabase();
-        return db.query(BeaconTable.TABLE_NAME, null, BeaconTable.COLUMN_STATE+" LIKE ? ",
+        return db.query(BeaconTable.TABLE_NAME, null, BeaconTable.COLUMN_NAME_STATE +" LIKE ? ",
                 new String[]{BeaconTable.STATE_INACTIVE},null,null,null);
     }
 
@@ -112,9 +121,9 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 
         SQLiteDatabase db= getReadableDatabase();
         Cursor c = db.query(BeaconTable.TABLE_NAME, null,
-                        BeaconTable.COLUMN_UUID+" LIKE ? AND "
-                        +BeaconTable.COLUMN_MAJOR+"=? AND "
-                        +BeaconTable.COLUMN_MINOR+"=?",
+                        BeaconTable.COLUMN_NAME_UUID +" LIKE ? AND "
+                        +BeaconTable.COLUMN_NAME_MAJOR +"=? AND "
+                        +BeaconTable.COLUMN_NAME_MINOR +"=?",
                 new String[]{beacon.getUUID(),
                         Integer.toString(beacon.getMajor()),
                         Integer.toString(beacon.getMinor())},
@@ -253,19 +262,28 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
 	}
 
     /*
-  * Inner class representing the table containing all the known beacons
-  */
+     * Inner class representing the table containing all the known beacons
+    */
     public static abstract class BeaconTable implements BaseColumns {
 
         public static final String TABLE_NAME = "beacons";
-        public static final String COLUMN_ID = _ID;
-        public static final String COLUMN_NAME = "device_name";
-        public static final String COLUMN_UUID = "uuid";
-        public static final String COLUMN_MAJOR = "major";
-        public static final String COLUMN_MINOR = "minor";
-        public static final String COLUMN_TX = "tx";
-        public static final String COLUMN_REMOTE_ID = "remote_id";
-        public static final String COLUMN_STATE = "state";
+        public static final String COLUMN_NAME_ID = _ID;
+        public static final String COLUMN_NAME_NAME = "device_name";
+        public static final String COLUMN_NAME_UUID = "uuid";
+        public static final String COLUMN_NAME_MAJOR = "major";
+        public static final String COLUMN_NAME_MINOR = "minor";
+        public static final String COLUMN_NAME_TX = "tx";
+        public static final String COLUMN_NAME_REMOTE_ID = "remote_id";
+        public static final String COLUMN_NAME_STATE = "state";
+
+        public static final int COLUMN_INDEX_ID = 0;
+        public static final int COLUMN_INDEX_NAME = 1;
+        public static final int COLUMN_INDEX_UUID = 2;
+        public static final int COLUMN_INDEX_MAJOR = 3;
+        public static final int COLUMN_INDEX_MINOR = 4;
+        public static final int COLUMN_INDEX_TX = 5;
+        public static final int COLUMN_INDEX_REMOTE_ID = 6;
+        public static final int COLUMN_INDEX_STATE = 7;
 
         public static final String STATE_ACTIVE="active";
         public static final String STATE_INACTIVE="inactive";
@@ -274,24 +292,24 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
         public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS "
                 + TABLE_NAME
                 + " ("
-                + COLUMN_ID
+                + COLUMN_NAME_ID
                 + " INTEGER PRIMARY KEY ,"
-                + COLUMN_NAME
+                + COLUMN_NAME_NAME
                 + " TEXT , "
-                + COLUMN_UUID
+                + COLUMN_NAME_UUID
                 + " VARCHAR(32) ,"
-                + COLUMN_MAJOR
+                + COLUMN_NAME_MAJOR
                 + " INT , "
-                + COLUMN_MINOR
+                + COLUMN_NAME_MINOR
                 + " INT , "
-                + COLUMN_TX
+                + COLUMN_NAME_TX
                 + " INT , "
-                + COLUMN_REMOTE_ID
+                + COLUMN_NAME_REMOTE_ID
                 + " INT ,"
-                + COLUMN_STATE
+                + COLUMN_NAME_STATE
                 + " TEXT , "
                 + "UNIQUE( "
-                + COLUMN_UUID+","+COLUMN_MAJOR+","+COLUMN_MINOR+","+COLUMN_STATE
+                + COLUMN_NAME_UUID +","+ COLUMN_NAME_MAJOR +","+ COLUMN_NAME_MINOR +","+ COLUMN_NAME_STATE
                 + " ) "
                 + " ) ";
 
@@ -299,7 +317,34 @@ public class DBHelper extends SQLiteOpenHelper implements BaseColumns {
                 + TABLE_NAME;
 
         private static String getIdColumnName() {
-            return COLUMN_ID;
+            return COLUMN_NAME_ID;
         }
+    }
+
+    public  static abstract class DeskTable implements BaseColumns {
+
+        public static final String TABLE_NAME = "desks";
+        public static final String COLUMN_NAME_ID = _ID;
+        public static final String COLUMN_NAME_KEY = "desk_key";
+
+        public static final int COLUMN_INDEX_ID = 0;
+        public static final int COLUMN_INDEX_KEY = 1;
+
+        public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS "
+                + TABLE_NAME
+                + " ("
+                + COLUMN_NAME_ID
+                + " INTEGER PRIMARY KEY ,"
+                + COLUMN_NAME_KEY
+                + " INT "
+                + " ) ";
+
+        public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
+                + TABLE_NAME;
+
+        private static String getIdColumnName() {
+            return COLUMN_NAME_ID;
+        }
+
     }
 }

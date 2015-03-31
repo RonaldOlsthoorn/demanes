@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,7 +40,7 @@ public class BeaconOverviewActivity extends Activity implements AdapterView.OnIt
         db = DBHelper.getDBHelper(this);
         cursor = db.getAllVisibleBeacons();
         beaconAdapter = new SimpleCursorAdapter(this, R.layout.listitem_device,cursor,
-                new String[]{DBHelper.BeaconTable.COLUMN_NAME},
+                new String[]{DBHelper.BeaconTable.COLUMN_NAME_NAME},
                 new int[]{R.id.listitem_device_name},0);
 
         ((ListView) findViewById(R.id.beaconList)).setAdapter(beaconAdapter);

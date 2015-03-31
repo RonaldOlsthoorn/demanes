@@ -7,16 +7,15 @@ import nl.senseos.mytimeatsense.util.Hex;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.ContentValues;
-import android.util.Log;
+import android.database.Cursor;
 
-public class iBeacon {
+public class iBeacon{
 
-    private static final String IBEACON_PREAMBLE = "0201061AFF4C000215";
+    public static final String IBEACON_PREAMBLE = "0201061AFF4C000215";
     private static String TAG = iBeacon.class.getSimpleName();
-
+    private BluetoothDevice device;
     private long localId=-1;
     private long remoteId=-1;
-
     private String state;
     private String name;
     private String UUID;
@@ -48,6 +47,18 @@ public class iBeacon {
         }
 
         return new iBeacon(device.getName(), uuid, major, minor, tx);
+    }
+
+    public static iBeacon getiBeacon(DBHelper db, int localId){
+
+        Cursor c = db.getBeacon(localId);
+        if(c.getCount()==0){
+            return null;
+        }
+        c.moveToFirst();
+
+        return new iBeacon(c.getInt(0), c.getInt(6), c.getString(1),
+                c.getString(2), c.getInt(3), c.getInt(4), c.getInt(5));
     }
 
     public iBeacon(String name, String uuid, int major, int minor, int tx) {
@@ -159,13 +170,13 @@ public class iBeacon {
     public long insertDB(DBHelper db){
 
         ContentValues beacon = new ContentValues();
-        beacon.put(DBHelper.BeaconTable.COLUMN_NAME, name);
-        beacon.put(DBHelper.BeaconTable.COLUMN_UUID, UUID);
-        beacon.put(DBHelper.BeaconTable.COLUMN_MAJOR, major);
-        beacon.put(DBHelper.BeaconTable.COLUMN_MINOR, minor);
-        beacon.put(DBHelper.BeaconTable.COLUMN_TX, tx);
-        beacon.put(DBHelper.BeaconTable.COLUMN_REMOTE_ID, remoteId);
-        beacon.put(DBHelper.BeaconTable.COLUMN_STATE, DBHelper.BeaconTable.STATE_ACTIVE);
+        beacon.put(DBHelper.BeaconTable.COLUMN_NAME_NAME, name);
+        beacon.put(DBHelper.BeaconTable.COLUMN_NAME_UUID, UUID);
+        beacon.put(DBHelper.BeaconTable.COLUMN_NAME_MAJOR, major);
+        beacon.put(DBHelper.BeaconTable.COLUMN_NAME_MINOR, minor);
+        beacon.put(DBHelper.BeaconTable.COLUMN_NAME_TX, tx);
+        beacon.put(DBHelper.BeaconTable.COLUMN_NAME_REMOTE_ID, remoteId);
+        beacon.put(DBHelper.BeaconTable.COLUMN_NAME_STATE, DBHelper.BeaconTable.STATE_ACTIVE);
 
         return localId = db.insertOrIgnore(DBHelper.BeaconTable.TABLE_NAME, beacon);
     }
@@ -177,19 +188,18 @@ public class iBeacon {
         }
 
         ContentValues beacon = new ContentValues();
-        beacon.put(DBHelper.BeaconTable.COLUMN_NAME, name);
-        beacon.put(DBHelper.BeaconTable.COLUMN_UUID, UUID);
-        beacon.put(DBHelper.BeaconTable.COLUMN_MAJOR, major);
-        beacon.put(DBHelper.BeaconTable.COLUMN_MINOR, minor);
-        beacon.put(DBHelper.BeaconTable.COLUMN_TX, tx);
-        beacon.put(DBHelper.BeaconTable.COLUMN_REMOTE_ID, remoteId);
+        beacon.put(DBHelper.BeaconTable.COLUMN_NAME_NAME, name);
+        beacon.put(DBHelper.BeaconTable.COLUMN_NAME_UUID, UUID);
+        beacon.put(DBHelper.BeaconTable.COLUMN_NAME_MAJOR, major);
+        beacon.put(DBHelper.BeaconTable.COLUMN_NAME_MINOR, minor);
+        beacon.put(DBHelper.BeaconTable.COLUMN_NAME_TX, tx);
+        beacon.put(DBHelper.BeaconTable.COLUMN_NAME_REMOTE_ID, remoteId);
 
         return (db.updateOrIgnore(DBHelper.BeaconTable.TABLE_NAME, localId, beacon));
     }
 
     public void deleteDB(DBHelper db){
 
-        Log.e(TAG, "delete Beacon, remoteId: "+getRemoteId());
         db.markOrDelete(this);
     }
 }
