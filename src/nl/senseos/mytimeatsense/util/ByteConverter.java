@@ -1,11 +1,6 @@
 package nl.senseos.mytimeatsense.util;
 
-import android.util.Log;
-
-import org.apache.http.util.ByteArrayBuffer;
-
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 /**
  * Created by ronald on 6-3-15.

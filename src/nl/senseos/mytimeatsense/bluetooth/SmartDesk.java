@@ -1,56 +1,61 @@
 package nl.senseos.mytimeatsense.bluetooth;
 
-import android.bluetooth.BluetoothDevice;
-
-import java.util.Arrays;
-import nl.senseos.mytimeatsense.util.ByteConverter;
-import nl.senseos.mytimeatsense.util.Hex;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by ronald on 26-3-15.
  */
-public class SmartDesk {
+public class SmartDesk implements Parcelable{
 
-    private int id;
-    private SmartChair chair;
+    private int key;
+    private int rssi;
 
-    public static SmartDesk createDesk(BluetoothDevice device, byte[] PDU){
+    public SmartDesk(int key, int rssi){
+        this.key = key; this.rssi = rssi;
+    }
 
-        String uuid;
-        int major;
-        int minor;
-        int tx;
-        int deskId;
+    public int getRssi(){
+        return rssi;
+    }
 
-        if (!Hex.bytesToHex(Arrays.copyOfRange(PDU, 0, 9)).equals(iBeacon.IBEACON_PREAMBLE)) {
-            return null;
-        } else {
-            uuid = Hex.bytesToHex(Arrays.copyOfRange(PDU, 9, 25));
-            major = ByteConverter.bytesToUnsignedInt(Arrays.copyOfRange(PDU, 25, 27));
-            minor = ByteConverter.bytesToUnsignedInt(Arrays.copyOfRange(PDU, 27, 29));
-            tx = ByteConverter.bytesToUnsignedInt(new byte[]{PDU[29]});
-            deskId = ByteConverter.bytesToUnsignedInt(new byte[]{PDU[30]});
+    public void setRssi(int rssi) {
+        this.rssi = rssi;
+    }
+
+    public int getKey() {
+        return key;
+    }
+
+    public void setKey(int key) {
+        this.key = key;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+        dest.writeInt(key);
+        dest.writeInt(rssi);
+    }
+
+    protected SmartDesk(Parcel source){
+
+        key = source.readInt();
+        rssi = source.readInt();
+    }
+
+    public static final Parcelable.Creator<SmartDesk> CREATOR = new Creator<SmartDesk>() {
+        public SmartDesk createFromParcel(Parcel source) {
+            return new SmartDesk(source);
         }
 
-        SmartDesk res = new SmartDesk(deskId);
-        res.setChair(new SmartChair(new iBeacon(device.getName(), uuid, major, minor, tx)));
-
-        return res;
-    }
-
-    public SmartDesk(int id){
-        this.id = id;
-    }
-
-    public int getId(){
-        return id;
-    }
-
-    public void setChair(SmartChair chair) {
-        this.chair = chair;
-    }
-
-    public SmartChair getChair() {
-        return chair;
-    }
+        public SmartDesk[] newArray(int size) {
+            return new SmartDesk[size];
+        }
+    };
 }

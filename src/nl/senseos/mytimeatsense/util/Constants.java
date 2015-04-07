@@ -3,37 +3,38 @@ package nl.senseos.mytimeatsense.util;
 
 public class Constants {
 
-	public static class StatusPrefs {
+	public static class Status {
 
 		public static final String PREFS_STATUS = "prefs_status";
 
-		public static final String STATUS_IN_OFFICE = "status_in_office";
+        public static final String STATUS_DETECTED = "status_detected";
 
-		public static final String STATUS_TOTAL_TIME = "status_total_time";
+        public static final String STATUS_DEVICE_KEY = "status_device_key";
 
-		public static final String STATUS_TIME_TODAY = "status_time_today";
+        public static final String STATUS_TIMESTAMP = "status_timestamp";
 
-		public static final String STATUS_TIME_WEEK = "status_time_week";
+        public static final int STATE_NOT_DETECTED = 0;
 
-		public static final String STATUS_TIMESTAMP = "status_time_stamp";
+		public static final int STATE_DESK_1 = 1;
+
+        public static final int STATE_DESK_2 = 2;
+
+        public static final int STATE_DESK_3 = 4;
+
+        public static final int STATE_DESK_4 = 4;
+
+        public static final int STATE_BIKE = 5;
+
+		public static final String STATUS_TIME_OFFICE = "time_office";
+
+		public static final String STATUS_TIME_BIKE = "time_bike";
+
+        public static final String STATUS_LIGHT_LEVEL = "light_level";
+
+        public static final String STATUS_LIGHT_FOCUS = "light_focus";
 
 	}
 
-	public static class GroupPrefs {
-
-		public static final String PREFS_GROUP = "prefs_group";
-
-		public static final int GROUP_ID = 17335;
-		
-		public static final int GROUP_SENSOR_ID = 799301;
-
-		public static final String GROUP_NAME = "Demanes";
-
-		public static final String GROUP_PASSWORD = "87f95196987d8c3bf339e2a52be957f4";
-
-		public static final int PAGE_SIZE = 1000;
-
-	}
 	
 	/**
 	 * Set of predefined names for the data types that CommonSense supports. Useful for creating new
@@ -56,27 +57,18 @@ public class Constants {
 	        // private constructor to prevent instantiation
 	    }
 	}
-	
-	public static class Prefs {
-
-		public static final String PREFS_DATA = "prefs_data";
-		public static final String PREFS_CONNECTION = "prefs_connection";
-
-	}
 
 	public static class Url{
+
 		/** Host name of CommonSense API */
 	    public static final String API_URL = "https://api.sense-os.nl/";
         public static final String DEV_URL = "http://ibeaconapi.dev.sense-os.nl/";
-
         public static final String SENSORS_URL = API_URL+"sensors";
 	    public static final String SENSOR_DEVICE_URL = API_URL + "sensors/%1/device";
 	    public static final String LOGIN_URL = API_URL+"login";
 	    public static final String LOGOUT_URL = API_URL+"logout";
-	    public static final String GROUP_URL = API_URL+"groups";
 	    public static final String CURRENT_USER_URL = API_URL+"users/current";
-        public static final String LABELS_URL = DEV_URL+"label";
-        public static final String BEACONS_URL = DEV_URL+"beacon";
+
     }
 	
 	public static class Sensors {
@@ -112,7 +104,6 @@ public class Constants {
 		public static final String PREFS_CREDS_UNAME = "username";
 		
 		public static final String PREFS_CREDS_PASSWORD = "password";
-		
 		/**
 		 * Key for login preference for session cookie.
 		 * 
@@ -121,8 +112,7 @@ public class Constants {
 		/**
 		 * Key for login preference for session id.
 		 */	
-		public static final String LOGIN_SESSION_ID = "session_id";	
-		
+		public static final String LOGIN_SESSION_ID = "session_id";
 		/**
          * Key for storing the online device type.
          */

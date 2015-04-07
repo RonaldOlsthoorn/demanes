@@ -1,6 +1,5 @@
 package nl.senseos.mytimeatsense.bluetooth;
 
-import nl.senseos.mytimeatsense.storage.DBHelper;
 import nl.senseos.mytimeatsense.sync.LocalUpdateService;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -19,19 +18,16 @@ public class BluetoothLeScanService extends Service {
 
 	public final static String SCAN_RESULT = "ble_scan_result";
 	public final static String SCAN_RESULT_TIMESTAMP = "ble_scan_result_timestamp";
-    public final static String SCAN_RESULT_ID = "ble_scan_result_id";
-	public final static String SCAN_RESULT_MAJOR = "ble_scan_result_major";
-	public final static String SCAN_RESULT_MINOR = "ble_scan_result_minor";
+    public final static String SCAN_RESULT_BEACON = "ble_scan_result_beacon";
 	private final static String TAG = BluetoothLeScanService.class
 			.getSimpleName();
 	private BluetoothManager mBluetoothManager;
 	private BluetoothAdapter mBluetoothAdapter;
-	// Stops scanning after 1 second.
-	public static final long SCAN_PERIOD = 5 * 1000l;
+
+	public static final long SCAN_PERIOD = 3 * 1000l;
 	private boolean beaconFound = false;
 	private boolean mScanning;
 	private iBeacon proximity;
-    private DBHelper db;
 
     /**
      *  Broadcast intent to update locally. Result of the scan is sent along
@@ -43,9 +39,7 @@ public class BluetoothLeScanService extends Service {
 		intent.putExtra(SCAN_RESULT_TIMESTAMP,
 				System.currentTimeMillis() / 1000); // (in full seconds!)
 		if(beaconFound){
-            intent.putExtra(SCAN_RESULT_ID, proximity.getLocalId());
-			intent.putExtra(SCAN_RESULT_MAJOR, proximity.getMajor());
-			intent.putExtra(SCAN_RESULT_MINOR, proximity.getMinor());			
+            intent.putExtra(SCAN_RESULT_BEACON, proximity);
 		}	
 		startService(intent);
 	}
@@ -71,6 +65,9 @@ public class BluetoothLeScanService extends Service {
 		// through
 		// BluetoothManager.
 		if (mBluetoothManager == null) {
+
+            Log.e(TAG,"BLE scan init");
+
 			mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 			if (mBluetoothManager == null) {
 				Log.e(TAG, "Unable to initialize BluetoothManager.");
@@ -82,7 +79,7 @@ public class BluetoothLeScanService extends Service {
 			Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
 			return false;
 		}
-        db = DBHelper.getDBHelper(this);
+
 		return true;
 	}
 
@@ -123,29 +120,28 @@ public class BluetoothLeScanService extends Service {
 				byte[] scanRecord) {
 
 			PDU = scanRecord;
-            iBeacon res = iBeacon.parseAd(device, PDU);
+            iBeacon res = AdParser.buildBeacon(device, PDU);
             if (res==null){
                 return;
             }
 
-            Log.v(TAG, "info: uuid: "+res.getUUID()+" major: "+res.getMajor()+" minor :"+res.getMinor());
-            iBeacon match = db.getMatchingBeacon(res);
-            if (match==null){
+            Log.v(TAG, "info: uuid: "+res.getUUID()
+                    +" major: "+res.getMajor()
+                    +" minor :"+res.getMinor());
+
+            if (!res.hasSmartDevice()){
                 return;
             }
 
-			beaconFound = true;
-			res.setRSSI(rssi);
-				
-			//check whether this device is closer than previous devices.
-			//override proximity if so.
-			if(proximity==null){
-				proximity = match;
-			}else{
-				if(proximity.getRSSI()< rssi){
-					proximity = match;
-				}
-			}
+            beaconFound = true;
+
+            if(proximity==null){
+                proximity = res;
+            }else{
+                if(proximity.getRSSI()< rssi){
+                    proximity = res;
+                }
+            }
 		}
 	};
 

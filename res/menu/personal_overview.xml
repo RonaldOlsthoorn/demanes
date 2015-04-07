@@ -1,12 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.mytimeatsense.PersonalOverviewActivity" >
+    tools:context="com.example.demanesdemo.PersonalOverviewActivity" >
 
     <item
-        android:id="@+id/personal_overview_to_beacons"
+        android:id="@+id/personal_overview_to_light_settings"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="@string/beacon_man"/>
+        android:title="Light preferences"/>
 
     <item
         android:id="@+id/personal_overview_switch"

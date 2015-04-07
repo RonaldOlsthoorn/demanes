@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">My Time at Sense</string>
+    <string name="app_name">Demanes demo</string>
     <string name="ble_not_supported">Bluetooth low energy not supported</string>
     <string name="title_activity_beacon_overview">BeaconOverviewActivity</string>
     <string name="action_settings">Settings</string>
@@ -10,5 +10,6 @@
     <string name="beacon_man">Beacon management</string>
     <string name="title_activity_beacon">BeaconActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_light_settings">LightSettingsActivity</string>
 
 </resources>

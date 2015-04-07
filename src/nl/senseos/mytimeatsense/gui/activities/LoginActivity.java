@@ -14,7 +14,6 @@ import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -121,7 +120,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 	 */
 	public void attemptLogin() {
 
-
 		// Reset errors.
 		mEmailView.setError(null);
 		mPasswordView.setError(null);
@@ -135,7 +133,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 		View focusView = null;
 
 		// Check for a valid password, if the user entered one.
-		if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+		if (TextUtils.isEmpty(password)) {
 			mPasswordView.setError(getString(R.string.error_invalid_password));
 			focusView = mPasswordView;
 			cancel = true;
@@ -166,14 +164,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 			
 			mLoginHandler.post(new UserLoginRunnable(email,password));
 		}
-	}
-
-	private boolean isEmailValid(String email) {
-		return email.contains("@");
-	}
-
-	private boolean isPasswordValid(String password) {
-		return password.length() > 4;
 	}
 
 	/**
@@ -298,7 +288,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 					return;
 				}
 				cs.getUserInfo();
-                cs.storeAllBeacons();
 				cs.logout();
 				msg.arg1=1;
 				mLoginHandler.sendMessage(msg);

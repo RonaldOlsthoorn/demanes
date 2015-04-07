@@ -3,13 +3,13 @@ package nl.senseos.mytimeatsense.gui.activities;
 import nl.senseos.mytimeatsense.R;
 import nl.senseos.mytimeatsense.bluetooth.BleAlarmReceiver;
 import nl.senseos.mytimeatsense.commonsense.MsgHandler;
-import nl.senseos.mytimeatsense.util.Clock;
+import nl.senseos.mytimeatsense.util.Constants;
 import nl.senseos.mytimeatsense.util.Constants.Auth;
 import nl.senseos.mytimeatsense.util.Constants.Sensors;
 import nl.senseos.mytimeatsense.storage.DBHelper;
 import nl.senseos.mytimeatsense.sync.GlobalUpdateAlarmReceiver;
 import nl.senseos.mytimeatsense.sync.LocalUpdateService;
-import nl.senseos.mytimeatsense.util.Constants.StatusPrefs;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -27,7 +27,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,8 +39,8 @@ public class PersonalOverviewActivity extends Activity {
 
 	private TextView status;
 
-	public static final long REPEAT_INTEVAL_MINS_BLE = 1;
-	public static final long REPEAT_INTEVAL_MINS_UPLOAD = 5;
+	public static final int REPEAT_INTEVAL_MINS_BLE = 1;
+	public static final int REPEAT_INTEVAL_MINS_UPLOAD = 5;
 
     public static final String STATUS_PRESENT = "Status: in the office";
     public static final String STATUS_ABSENT = "Status: not in the office";
@@ -56,7 +56,9 @@ public class PersonalOverviewActivity extends Activity {
 	private Intent GlobalUpdateServiceIntent;
 	private PendingIntent GlobalUpdatePendingIntent;
 	private PendingIntent BlePendingIntent;
-	
+
+    private StatusHandler mStatusHandler;
+
 	private Handler logoutHandler;
 
 	@Override
@@ -115,7 +117,7 @@ public class PersonalOverviewActivity extends Activity {
 			startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
 		}
 
-		statusPrefs = getSharedPreferences(StatusPrefs.PREFS_STATUS,
+		statusPrefs = getSharedPreferences(Constants.Status.PREFS_STATUS,
 				Context.MODE_PRIVATE);
 
 		setUpdateTimers();
@@ -162,7 +164,7 @@ public class PersonalOverviewActivity extends Activity {
 
         setUpdateTimers();
 
-		statusPrefs = getSharedPreferences(StatusPrefs.PREFS_STATUS,
+		statusPrefs = getSharedPreferences(Constants.Status.PREFS_STATUS,
 				Context.MODE_PRIVATE);
 
 		super.onActivityResult(requestCode, resultCode, data);
@@ -182,8 +184,8 @@ public class PersonalOverviewActivity extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 
-        if (id == R.id.personal_overview_to_beacons) {
-            toBeacons(null);
+        if (id == R.id.personal_overview_to_light_settings) {
+            toLightSettings();
             return true;
         }
 		if (id == R.id.personal_overview_switch) {
@@ -221,12 +223,11 @@ public class PersonalOverviewActivity extends Activity {
 					sensorEditor.commit();
 
 					SharedPreferences sStatusPrefs = getSharedPreferences(
-							StatusPrefs.PREFS_STATUS, Context.MODE_PRIVATE);
+							Constants.Status.PREFS_STATUS, Context.MODE_PRIVATE);
 					Editor statusEditor = sStatusPrefs.edit();
-					statusEditor.putBoolean(StatusPrefs.STATUS_IN_OFFICE, false);
-					statusEditor.putLong(StatusPrefs.STATUS_TOTAL_TIME, 0);
-					statusEditor.putLong(StatusPrefs.STATUS_TIME_TODAY, 0);
-					statusEditor.putLong(StatusPrefs.STATUS_TIME_WEEK, 0);
+                    statusEditor.putInt(Constants.Status.STATUS_DEVICE_KEY, 0);
+					statusEditor.putLong(Constants.Status.STATUS_TIME_OFFICE, 0);
+					statusEditor.putLong(Constants.Status.STATUS_TIME_BIKE, 0);
 					statusEditor.commit();
 
 					DBHelper DB = DBHelper.getDBHelper(PersonalOverviewActivity.this);
@@ -259,12 +260,21 @@ public class PersonalOverviewActivity extends Activity {
 	public void onResume() {
 		super.onResume(); // Always call the superclass method first
 
-		statusPrefs = getSharedPreferences(StatusPrefs.PREFS_STATUS,
+		statusPrefs = getSharedPreferences(Constants.Status.PREFS_STATUS,
 				Context.MODE_PRIVATE);
 		
 		status = (TextView) findViewById(R.id.personal_overview_status);
 
-		timerHandler.postDelayed(updateTimerThread, 0);
+        ImageView[] images = new ImageView[5];
+        images[0] = (ImageView) findViewById(R.id.desk_1);
+        images[1] = (ImageView) findViewById(R.id.desk_2);
+        images[2] = (ImageView) findViewById(R.id.desk_3);
+        images[3] = (ImageView) findViewById(R.id.desk_4);
+        images[4] = (ImageView) findViewById(R.id.bike);
+
+        mStatusHandler = new StatusHandler(images);
+
+        timerHandler.postDelayed(updateTimerThread, 0);
 	}
 
 	@Override
@@ -289,14 +299,9 @@ public class PersonalOverviewActivity extends Activity {
 		timerHandler.removeCallbacks(updateTimerThread);
 	}
 
-	public void toGroup(View view){
-		
-		Intent intent = new Intent(this, GroupOverviewActivity.class);
-		startActivity(intent);
-	}
+    public void toLightSettings(){
 
-    public void toBeacons(View view){
-        Intent intent = new Intent(this, BeaconOverviewActivity.class);
+        Intent intent = new Intent(this, LightSettingsActivity.class);
         startActivity(intent);
     }
 
@@ -304,17 +309,35 @@ public class PersonalOverviewActivity extends Activity {
 
 	private Runnable updateTimerThread = new Runnable() {
 
-		long currentTimeInSeconds;
-		long timeDifferenceSeconds;
-		long displayTime;
+        int key;
 
 		public void run() {
+
+            key = statusPrefs.getInt(Constants.Status.STATUS_DEVICE_KEY,0);
+            mStatusHandler.setImage(key);
 
 			timerHandler.postDelayed(this, 1000);
 		}
 	};
 
-    public void setStatus(){
+    private class StatusHandler{
 
+        ImageView[] images;
+        int index=-1;
+
+        public StatusHandler(ImageView[] im){
+            images = im;
+        }
+
+        public void setImage(int key){
+
+            if(index!=-1){
+                images[index].setAlpha((float) 0.25);
+            }
+            index = key-1;
+            if(index!=-1){
+                images[index].setAlpha((float) 1);
+            }
+        }
     }
 }
