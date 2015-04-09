@@ -442,8 +442,13 @@ public class CommonSenseAdapter {
             JSONObject datapackage = new JSONObject();
             datapackage.put("state", null);
 
+            Log.e(TAG, "url: "+url);
+            Log.e(TAG, "datapackage: \n"+datapackage.toString(4));
+
             // perform actual request
             Map<String, String> response = request(url, METHOD_PUT, datapackage, cookie);
+
+            Log.e(TAG, response.get(RESPONSE_CODE));
             return;
         }
 
@@ -452,56 +457,11 @@ public class CommonSenseAdapter {
         status.put("focus", sStatusPrefs.getInt(Constants.Status.STATUS_LIGHT_FOCUS, 0));
 
         JSONObject datapackage = new JSONObject();
-        datapackage.put("status", status);
+        datapackage.put("state", status);
 
         // perform actual request
-        Map<String, String> response = request(url, METHOD_POST, datapackage, cookie);
+        Map<String, String> response = request(url, METHOD_PUT, datapackage, cookie);
         return;
-    }
-
-    /**
-     * requests all the beacons that are attached to the sense office label
-     *
-     * @return JSONArray containing JSON representation of all the beacons attached to the
-     * sense office label
-     * @throws IOException   occurs when the connection has trouble or an unexpected response is
-     *                       obtained
-     * @throws IOException   In case of communication failure to CommonSense
-     * @throws JSONException In case of unparseable response from CommonSense
-     */
-    public JSONArray getAllSenseBeacons() throws IOException, JSONException {
-
-        if (null == sAuthPrefs) {
-            sAuthPrefs = context.getSharedPreferences(Auth.PREFS_CREDS,
-                    Context.MODE_PRIVATE);
-        }
-        String cookie = sAuthPrefs.getString(Auth.LOGIN_COOKIE, null);
-
-        JSONObject status = new JSONObject();
-        status.put("level", sStatusPrefs.getInt(Status.STATUS_LIGHT_LEVEL, 0));
-        status.put("focus", sStatusPrefs.getInt(Status.STATUS_LIGHT_FOCUS, 0));
-
-        JSONObject datapackage = new JSONObject();
-        datapackage.put("status", status);
-
-        // prepare request to create new sensor
-        String url = Url.DEV_URL+"desk/"+sStatusPrefs.getInt(Status.STATUS_DEVICE_KEY,0)+"/state";
-
-        // perform actual request
-        Map<String, String> response = request(url, METHOD_POST, datapackage, cookie);
-
-        String responseCode = response.get(RESPONSE_CODE);
-        if (!"200".equals(responseCode)) {
-            Log.w(TAG, "Failed to get list of beacons! Response code: "
-                    + responseCode);
-            throw new IOException("Incorrect response from CommonSense: "
-                    + responseCode);
-        }
-
-        // parse response and store the list
-        JSONObject content = new JSONObject(response.get(RESPONSE_CONTENT));
-
-        return content.getJSONArray("beacons");
     }
 
     /**

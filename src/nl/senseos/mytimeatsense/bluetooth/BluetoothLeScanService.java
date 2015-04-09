@@ -66,8 +66,6 @@ public class BluetoothLeScanService extends Service {
 		// BluetoothManager.
 		if (mBluetoothManager == null) {
 
-            Log.e(TAG,"BLE scan init");
-
 			mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 			if (mBluetoothManager == null) {
 				Log.e(TAG, "Unable to initialize BluetoothManager.");

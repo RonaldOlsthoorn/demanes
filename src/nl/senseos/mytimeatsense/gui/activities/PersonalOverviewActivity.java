@@ -27,23 +27,26 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class PersonalOverviewActivity extends Activity {
 
-	private String TAG = "perosnalOverviewActivity";
+    public final static String TIMER_TYPE = "timer_type";
+    public final static String TIMER_DESK = "timer_desk";
+    public final static String TIMER_BIKE = "timer_bike";
+
+
+    private String TAG = "perosnalOverviewActivity";
 	private final int REQUEST_ENABLE_BT = 10;
 	private final int REQUEST_CREDENTIALS = 20;
 
 	private TextView status;
 
-	public static final int REPEAT_INTEVAL_MINS_BLE = 1;
-	public static final int REPEAT_INTEVAL_MINS_UPLOAD = 5;
-
-    public static final String STATUS_PRESENT = "Status: in the office";
-    public static final String STATUS_ABSENT = "Status: not in the office";
+	public static final int REPEAT_INTEVAL_BLE_SEC = 30;
+	public static final int REPEAT_INTEVAL_UPLOAD_SEC = 60;
 
 	private AlarmManager alarmMgr;
 	private SharedPreferences statusPrefs;
@@ -67,7 +70,7 @@ public class PersonalOverviewActivity extends Activity {
 		setContentView(R.layout.activity_personal_overview);
 
 		Log.e(TAG,"REPEAT_INTERVAL_MINS_BLE: "
-                + REPEAT_INTEVAL_MINS_BLE+"TIME_OUT_LIMIT: "
+                + REPEAT_INTEVAL_BLE_SEC +"TIME_OUT_LIMIT: "
                 +LocalUpdateService.TIME_OUT_LIMIT);
 	
 		// check if password/username is set
@@ -133,7 +136,7 @@ public class PersonalOverviewActivity extends Activity {
         alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 SystemClock.elapsedRealtime() + (1 * 1000),
-                REPEAT_INTEVAL_MINS_BLE * 60 * 1000, BlePendingIntent);
+                REPEAT_INTEVAL_BLE_SEC  * 1000, BlePendingIntent);
 
         GlobalUpdateServiceIntent = new Intent(this,
                 GlobalUpdateAlarmReceiver.class);
@@ -142,7 +145,7 @@ public class PersonalOverviewActivity extends Activity {
 
         alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 SystemClock.elapsedRealtime() + (1 * 1000),
-                REPEAT_INTEVAL_MINS_UPLOAD * 60 * 1000,
+                REPEAT_INTEVAL_UPLOAD_SEC * 1000,
                 GlobalUpdatePendingIntent);
 
     }
@@ -260,6 +263,22 @@ public class PersonalOverviewActivity extends Activity {
 	public void onResume() {
 		super.onResume(); // Always call the superclass method first
 
+
+        // Initializes a Bluetooth adapter. For API level 18 and above, get a
+        // reference to
+        // BluetoothAdapter through BluetoothManager.
+        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothAdapter mBluetoothAdapter = bluetoothManager.getAdapter();
+
+        // Ensures Bluetooth is available on the device and it is enabled. If
+        // not,
+        // displays a dialog requesting user permission to enable Bluetooth.
+        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(
+                    BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
+
 		statusPrefs = getSharedPreferences(Constants.Status.PREFS_STATUS,
 				Context.MODE_PRIVATE);
 		
@@ -305,6 +324,20 @@ public class PersonalOverviewActivity extends Activity {
         startActivity(intent);
     }
 
+    public void toDeskTimer(View view){
+
+        Intent intent = new Intent(this, TimerActivity.class);
+        intent.putExtra(TIMER_TYPE, TIMER_DESK);
+        startActivity(intent);
+    }
+
+    public void toBikeTimer(View view){
+
+        Intent intent = new Intent(this, TimerActivity.class);
+        intent.putExtra(TIMER_TYPE, TIMER_BIKE);
+        startActivity(intent);
+    }
+
 	private Handler timerHandler = new Handler();
 
 	private Runnable updateTimerThread = new Runnable() {
@@ -315,7 +348,7 @@ public class PersonalOverviewActivity extends Activity {
 
             key = statusPrefs.getInt(Constants.Status.STATUS_DEVICE_KEY,0);
             mStatusHandler.setImage(key);
-
+            mStatusHandler.setMessage(key);
 			timerHandler.postDelayed(this, 1000);
 		}
 	};
@@ -333,11 +366,26 @@ public class PersonalOverviewActivity extends Activity {
 
             if(index!=-1){
                 images[index].setAlpha((float) 0.25);
+                images[index].setEnabled(false);
             }
             index = key-1;
             if(index!=-1){
                 images[index].setAlpha((float) 1);
+                images[index].setEnabled(true);
             }
+        }
+
+        public void setMessage(int key){
+
+            if(key==0 || key>5){
+                status.setText("No device detected");
+                return;
+            }
+            if(key<5){
+                status.setText("Seated at desk: "+key);
+                return;
+            }
+            status.setText("Using the SmartBike");
         }
     }
 }

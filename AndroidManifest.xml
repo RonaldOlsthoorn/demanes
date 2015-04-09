@@ -18,6 +18,13 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+    <android:uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+    <android:uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -33,30 +40,33 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-                   android:name=".gui.activities.LightSettingsActivity"
-                   android:label="@string/title_activity_light_settings" >
+            android:name=".gui.activities.LightSettingsActivity"
+            android:label="@string/title_activity_light_settings" >
         </activity>
 
-               <receiver android:name=".bluetooth.BleAlarmReceiver" >
-               </receiver>
+        <receiver android:name=".bluetooth.BleAlarmReceiver" >
+        </receiver>
 
-               <service android:name=".sync.LocalUpdateService" >
-               </service>
-               <service android:name=".bluetooth.BluetoothLeScanService" >
-               </service>
+        <service android:name=".sync.LocalUpdateService" >
+        </service>
+        <service android:name=".bluetooth.BluetoothLeScanService" >
+        </service>
 
-               <receiver android:name=".sync.GlobalUpdateAlarmReceiver" >
-               </receiver>
+        <receiver android:name=".sync.GlobalUpdateAlarmReceiver" >
+        </receiver>
 
-               <service android:name=".sync.StatusUpdateService" >
-               </service>
+        <service android:name=".sync.StatusUpdateService" >
+        </service>
 
+        <activity
+            android:name=".gui.activities.TimerActivity"
+            android:label="@string/title_activity_timer" >
+        </activity>
+    </application>
 
-           </application>
-
-       </manifest>
+</manifest>

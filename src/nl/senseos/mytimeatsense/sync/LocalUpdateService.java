@@ -19,7 +19,7 @@ import android.util.Log;
 public class LocalUpdateService extends IntentService {
 
 	private final static String TAG = IntentService.class.getSimpleName();
-	public static final long TIME_OUT_LIMIT = (PersonalOverviewActivity.REPEAT_INTEVAL_MINS_BLE*60*2);
+	public static final long TIME_OUT_LIMIT = (PersonalOverviewActivity.REPEAT_INTEVAL_BLE_SEC * 2);
 	private DBHelper DB;
 	private boolean scanResult;
 	private long scanResultTS;
@@ -49,7 +49,6 @@ public class LocalUpdateService extends IntentService {
             beacon = intent.getParcelableExtra(BluetoothLeScanService.SCAN_RESULT_BEACON);
         }
 
-
 		Log.d(TAG, "detected: " + scanResult + " ts: " + scanResultTS);
 
         DB = DBHelper.getDBHelper(this);
@@ -61,7 +60,6 @@ public class LocalUpdateService extends IntentService {
             v.put(DBHelper.DetectionTable.COLUMN_DETECTION_RESULT, scanResult);
             v.put(DBHelper.DetectionTable.COLUMN_DEVICE, Status.STATE_NOT_DETECTED);
             v.put(DBHelper.DetectionTable.COLUMN_DEVICE_OCCUPIED, false);
-
 
         }else{
             v.put(DBHelper.DetectionTable.COLUMN_TIMESTAMP, scanResultTS);
@@ -77,8 +75,18 @@ public class LocalUpdateService extends IntentService {
 				Status.PREFS_STATUS, Context.MODE_PRIVATE);
 		Editor prefsEditor = statusPrefs.edit();
 
+        Log.e(TAG, "time office update: "+ getTimeOffice(
+                beacon==null? 0: beacon.getSmartDevice().getKey(), statusPrefs.getLong(Status.STATUS_TIMESTAMP, 0)
+                ));
+
+        Log.e(TAG, "time bike update: "+ getTimeBike(
+                beacon==null? 0: beacon.getSmartDevice().getKey(), statusPrefs.getLong(Status.STATUS_TIMESTAMP, 0)
+        ));
+
+
+
         prefsEditor.putBoolean(Status.STATUS_DETECTED, scanResult);
-        prefsEditor.putInt(Status.STATUS_DEVICE_KEY, beacon==null? 0: beacon.getSmartDevice().getKey());
+        prefsEditor.putInt(Status.STATUS_DEVICE_KEY, beacon == null ? 0 : beacon.getSmartDevice().getKey());
         prefsEditor.putLong(Status.STATUS_TIMESTAMP, scanResultTS);
         prefsEditor.putLong(Status.STATUS_TIME_OFFICE, getTimeOffice(
                     beacon==null? 0: beacon.getSmartDevice().getKey(), statusPrefs.getLong(Status.STATUS_TIMESTAMP, 0)
@@ -93,9 +101,14 @@ public class LocalUpdateService extends IntentService {
 
 	public long getTimeOffice(int deviceKey, long previousScanResultTs) {
 
-        boolean previousScanResult = (deviceKey>0 && deviceKey<5);
+        int previousKey = statusPrefs.getInt(Status.STATUS_DEVICE_KEY,0);
+
+        boolean follower = (previousKey>0 && previousKey<5);
+        boolean leader = (deviceKey>0 && deviceKey<5);
+
 		
-		if(scanResultTS-previousScanResultTs>TIME_OUT_LIMIT ||(!previousScanResult && !scanResult)){
+		if(scanResultTS-previousScanResultTs>TIME_OUT_LIMIT ||(!follower && !leader)){
+            Log.e(TAG,"both false or time out");
 			return statusPrefs.getLong(Status.STATUS_TIME_OFFICE, 0);
 		}
 		
@@ -106,10 +119,10 @@ public class LocalUpdateService extends IntentService {
 		
 		if(previousScanResultTs < calMidnight.getTimeInMillis()/1000 ){
 			
-			if(!scanResult){
+			if(!leader){
 				return 0;
 			}
-			if(!previousScanResult){
+			if(!follower){
 				long delta =(1/2)*(scanResultTS-(calMidnight.getTimeInMillis()/1000));
 				return delta;
 			}
@@ -117,10 +130,11 @@ public class LocalUpdateService extends IntentService {
 			return delta;
 		}
 		else{
-			if((!previousScanResult && scanResult) || (previousScanResult && !scanResult)){
+			if((!follower && leader) || (follower && !leader)){
+
 				long delta = (1/2)*(scanResultTS-statusPrefs.getLong(Status.STATUS_TIMESTAMP, 0));
 				return statusPrefs.getLong(Status.STATUS_TIME_OFFICE, 0)+delta;
-			}		
+			}
 	
 			long delta =(scanResultTS-statusPrefs.getLong(Status.STATUS_TIMESTAMP, 0));
 			return statusPrefs.getLong(Status.STATUS_TIME_OFFICE, 0)+delta;
@@ -129,9 +143,14 @@ public class LocalUpdateService extends IntentService {
 
     public long getTimeBike(int deviceKey, long previousScanResultTs) {
 
-        boolean previousScanResult = deviceKey==5;
+        boolean follower = (statusPrefs.getInt(Status.STATUS_DEVICE_KEY,0)==5);
+        boolean leader = (deviceKey==5);
 
-        if(scanResultTS-previousScanResultTs>TIME_OUT_LIMIT ||(!previousScanResult && !scanResult)){
+        Log.e(TAG,"timeBike. follower: "+follower+" scanResult: "+scanResult+ " deviceKey: "+deviceKey
+                +"time Bike: "+ statusPrefs.getLong(Status.STATUS_TIME_OFFICE, 0));
+
+        if(scanResultTS-previousScanResultTs>TIME_OUT_LIMIT ||(!follower && !leader)){
+            Log.e(TAG,"both false or time out");
             return statusPrefs.getLong(Status.STATUS_TIME_BIKE, 0);
         }
 
@@ -142,10 +161,12 @@ public class LocalUpdateService extends IntentService {
 
         if(previousScanResultTs < calMidnight.getTimeInMillis()/1000 ){
 
-            if(!scanResult){
+            Log.e(TAG, "before midnight");
+
+            if(!leader){
                 return 0;
             }
-            if(!previousScanResult){
+            if(!follower){
                 long delta =(1/2)*(scanResultTS-(calMidnight.getTimeInMillis()/1000));
                 return delta;
             }
@@ -153,13 +174,14 @@ public class LocalUpdateService extends IntentService {
             return delta;
         }
         else{
-            if((!previousScanResult && scanResult) || (previousScanResult && !scanResult)){
+            if((!follower && leader) || (follower && !leader)){
+                Log.e(TAG, "time bike, half increment");
                 long delta = (1/2)*(scanResultTS-statusPrefs.getLong(Status.STATUS_TIMESTAMP, 0));
-                return statusPrefs.getLong(Status.STATUS_TIME_OFFICE, 0)+delta;
+                return statusPrefs.getLong(Status.STATUS_TIME_BIKE, 0)+delta;
             }
-
+            Log.e(TAG, "time bike, full increment");
             long delta =(scanResultTS-statusPrefs.getLong(Status.STATUS_TIMESTAMP, 0));
-            return statusPrefs.getLong(Status.STATUS_TIME_OFFICE, 0)+delta;
+            return statusPrefs.getLong(Status.STATUS_TIME_BIKE, 0)+delta;
         }
     }
 }

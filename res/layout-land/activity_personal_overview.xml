@@ -1,0 +1,123 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.demanesdemo.PersonalOverviewActivity" >
+
+    <ProgressBar
+        android:id="@+id/personal_overview_progress_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+
+            android:id="@+id/personal_overview_header"
+        android:layout_centerHorizontal="true">
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/title_activity_personal_overview"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/personal_overview_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:gravity="center"
+                android:text="@string/status_absent"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    </LinearLayout>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/bike"
+        android:src="@drawable/bicycle_full"
+        android:layout_column="0"
+        android:layout_gravity="center_horizontal"
+        android:alpha="0.25"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_below="@+id/personal_overview_header"
+        android:layout_centerHorizontal="true"
+        android:onClick="toBikeTimer"
+        android:clickable = "false"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/desk_1"
+        android:layout_column="0"
+        android:src="@drawable/desk_full"
+        android:alpha="0.25"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_alignTop="@+id/personal_overview_header"
+        android:layout_toStartOf="@+id/personal_overview_header"
+        android:onClick="toDeskTimer"
+        android:clickable = "false"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/desk_2"
+        android:layout_column="1"
+        android:src="@drawable/desk_full"
+        android:alpha="0.25"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_alignTop="@+id/personal_overview_header"
+        android:layout_toEndOf="@+id/personal_overview_header"
+        android:onClick="toDeskTimer"
+        android:clickable = "false"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/desk_3"
+        android:layout_column="0"
+        android:src="@drawable/desk_full"
+        android:alpha="0.25"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/personal_overview_header"
+        android:onClick="toDeskTimer"
+        android:clickable = "false"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/desk_4"
+        android:layout_column="1"
+        android:src="@drawable/desk_full"
+        android:alpha="0.25"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/personal_overview_header"
+        android:onClick="toDeskTimer"
+        android:clickable = "false"/>
+
+
+</RelativeLayout>

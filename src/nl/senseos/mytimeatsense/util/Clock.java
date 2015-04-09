@@ -28,6 +28,23 @@ public class Clock {
 
     }
 
+    public Clock(){
+        days=0;
+        hours=0;
+        minutes=0;
+        seconds=0;
+    }
+
+    public void setTime(long totalSeconds){
+
+        days = (int) totalSeconds / (24 * 60 * 60);
+        hours = (int) (totalSeconds - 24 * 60 * 60 * days) / (60 * 60);
+        minutes = (int) (totalSeconds - days * (24 * 60 * 60) - hours
+                * (60 * 60)) / (60);
+        seconds = (int) (totalSeconds - days * (24 * 60 * 60) - hours
+                * (60 * 60) - minutes * 60);
+    }
+
     public String getDays(){
         return Integer.toString(days);
     }

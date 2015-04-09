@@ -3,13 +3,9 @@
 
     <string name="app_name">Demanes demo</string>
     <string name="ble_not_supported">Bluetooth low energy not supported</string>
-    <string name="title_activity_beacon_overview">BeaconOverviewActivity</string>
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_add_beacon">AddBeaconActivity</string>
     <string name="menu_stop">stop scanning</string>
     <string name="beacon_man">Beacon management</string>
-    <string name="title_activity_beacon">BeaconActivity</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="title_activity_light_settings">LightSettingsActivity</string>
+    <string name="title_activity_light_settings">Light Settings</string>
+    <string name="title_activity_timer">Timer</string>
 
 </resources>

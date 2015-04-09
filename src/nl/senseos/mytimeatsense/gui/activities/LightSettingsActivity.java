@@ -25,6 +25,7 @@ public class LightSettingsActivity extends Activity {
                 Context.MODE_PRIVATE);
 
         SeekBar lightLevel = (SeekBar) findViewById(R.id.seekBar_level);
+        lightLevel.setProgress(statusPrefs.getInt(Constants.Status.STATUS_LIGHT_LEVEL,0));
         lightLevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -40,10 +41,12 @@ public class LightSettingsActivity extends Activity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 SharedPreferences.Editor statusEditor = statusPrefs.edit();
                 statusEditor.putInt(Constants.Status.STATUS_LIGHT_LEVEL, seekBar.getProgress());
+                statusEditor.commit();
             }
         });
 
         SeekBar lightFocus = (SeekBar) findViewById(R.id.seekBar_focus);
+        lightFocus.setProgress(statusPrefs.getInt(Constants.Status.STATUS_LIGHT_FOCUS,0));
         lightFocus.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -59,6 +62,7 @@ public class LightSettingsActivity extends Activity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 SharedPreferences.Editor statusEditor = statusPrefs.edit();
                 statusEditor.putInt(Constants.Status.STATUS_LIGHT_FOCUS, seekBar.getProgress());
+                statusEditor.commit();
             }
         });
     }
@@ -77,11 +81,6 @@ public class LightSettingsActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }

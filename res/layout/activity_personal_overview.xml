@@ -48,8 +48,9 @@
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_alignParentStart="true">
+        android:layout_below="@+id/personal_overview_header"
+        android:layout_alignParentStart="true"
+        android:id="@+id/tableLayout">
 
         <TableRow
             android:layout_width="fill_parent"
@@ -58,23 +59,27 @@
             android:gravity="center"
             >
 
-            <ImageView
+            <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/desk_1"
                 android:layout_column="0"
                 android:src="@drawable/desk_full"
                 android:layout_margin="10dp"
-                android:alpha="0.25" />
+                android:alpha="0.25"
+                android:onClick="toDeskTimer"
+                android:clickable = "false" />
 
-            <ImageView
+            <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/desk_2"
                 android:layout_column="1"
                 android:src="@drawable/desk_full"
                 android:layout_margin="10dp"
-                android:alpha="0.25" />
+                android:alpha="0.25"
+                android:onClick="toDeskTimer"
+                android:clickable = "false"/>
         </TableRow>
 
         <TableRow
@@ -82,35 +87,45 @@
             android:layout_height="fill_parent"
             android:gravity="center">
 
-            <ImageView
+            <ImageButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/desk_3"
                 android:layout_column="0"
                 android:src="@drawable/desk_full"
                 android:layout_margin="10dp"
-                android:alpha="0.25" />
+                android:alpha="0.25"
+                android:onClick="toDeskTimer"
+                android:clickable = "false"/>
 
-            <ImageView
+            <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/desk_4"
                 android:layout_column="1"
                 android:src="@drawable/desk_full"
                 android:layout_margin="10dp"
-                android:alpha="0.25" />
+                android:alpha="0.25"
+                android:onClick="toDeskTimer"
+                android:clickable = "false"/>
         </TableRow>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/bike"
-            android:src="@drawable/bicycle_full"
-            android:layout_margin="10dp"
-            android:layout_gravity="center_horizontal"
-            android:alpha="0.25" />
     </TableLayout>
 
-
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/bike"
+        android:src="@drawable/bicycle_full"
+        android:layout_column="0"
+        android:layout_gravity="center_horizontal"
+        android:alpha="0.25"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_below="@+id/tableLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:onClick="toBikeTimer"
+        android:clickable = "false"/>
 
 </RelativeLayout>
